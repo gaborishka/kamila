@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Call Result | Kamila AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-on-surface": "#eef0ff",
+              "on-primary": "#ffffff",
+              "outline-variant": "#c3c6d6",
+              "background": "#faf8ff",
+              "surface": "#faf8ff",
+              "on-secondary-fixed-variant": "#005236",
+              "primary-fixed": "#dae2ff",
+              "secondary-fixed-dim": "#4edea3",
+              "surface-container-low": "#f2f3ff",
+              "on-error": "#ffffff",
+              "on-primary-fixed-variant": "#0040a1",
+              "surface-variant": "#dae2fd",
+              "surface-container-high": "#e2e7ff",
+              "inverse-primary": "#b2c5ff",
+              "on-background": "#131b2e",
+              "primary-fixed-dim": "#b2c5ff",
+              "on-surface": "#131b2e",
+              "surface-container-highest": "#dae2fd",
+              "on-primary-container": "#ccd8ff",
+              "surface-container": "#eaedff",
+              "primary": "#0040a1",
+              "secondary": "#006c49",
+              "on-error-container": "#93000a",
+              "primary-container": "#0056d2",
+              "on-tertiary": "#ffffff",
+              "inverse-surface": "#283044",
+              "tertiary": "#663f00",
+              "on-tertiary-fixed-variant": "#653e00",
+              "on-secondary-container": "#00714d",
+              "on-secondary": "#ffffff",
+              "secondary-fixed": "#6ffbbe",
+              "on-tertiary-container": "#ffd29e",
+              "error": "#ba1a1a",
+              "surface-tint": "#0056d2",
+              "surface-dim": "#d2d9f4",
+              "secondary-container": "#6cf8bb",
+              "on-primary-fixed": "#001847",
+              "surface-bright": "#faf8ff",
+              "tertiary-fixed-dim": "#ffb95f",
+              "surface-container-lowest": "#ffffff",
+              "error-container": "#ffdad6",
+              "on-surface-variant": "#424654",
+              "outline": "#737785",
+              "tertiary-container": "#865400",
+              "on-secondary-fixed": "#002113",
+              "tertiary-fixed": "#ffddb8"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-effect {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      .gradient-primary {
+        background: linear-gradient(135deg, #0040a1 0%, #0056d2 100%);
+      }
+      .ghost-border {
+        border: 1px solid rgba(195, 198, 214, 0.2);
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body antialiased">
+<!-- TopNavBar -->
+<nav class="bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md font-['Inter'] antialiased tracking-tight shadow-sm dark:shadow-none docked full-width top-0 sticky z-50 border-b border-slate-200/20 dark:border-slate-800/20">
+<div class="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
+<div class="text-2xl font-black tracking-tighter text-blue-900 dark:text-white">Kamila</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-all duration-200" href="#">History</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="gradient-primary text-on-primary px-5 py-2 rounded-md font-semibold text-sm hover:bg-blue-50/50 transition-all active:scale-[0.98]">
+                    New Call
+                </button>
+<span class="material-symbols-outlined text-slate-500 cursor-pointer p-2 hover:bg-blue-50/50 rounded-full transition-all">account_circle</span>
+</div>
+</div>
+</nav>
+<main class="max-w-5xl mx-auto px-6 py-12">
+<!-- Hero Success Section -->
+<div class="mb-12 relative">
+<div class="absolute -top-12 -left-12 w-64 h-64 bg-secondary-container/20 rounded-full blur-3xl -z-10"></div>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label text-xs font-bold tracking-wider uppercase mb-4">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                        Resolution Secured
+                    </div>
+<h1 class="text-5xl md:text-6xl font-black tracking-tighter text-on-background leading-none">
+                        Refund approved!
+                    </h1>
+</div>
+<div class="text-right">
+<div class="text-primary text-5xl font-black tracking-tighter">€400.00</div>
+<div class="text-on-surface-variant font-medium">Returned within 5-7 days</div>
+</div>
+</div>
+<!-- Summary Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="md:col-span-2 bg-surface-container-lowest p-8 rounded-xl ghost-border flex flex-col justify-between min-h-[200px]">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-on-surface-variant font-label text-xs font-bold tracking-widest uppercase mb-1">Company</p>
+<h3 class="text-2xl font-bold">Lufthansa Group</h3>
+</div>
+<span class="material-symbols-outlined text-primary text-3xl">flight_takeoff</span>
+</div>
+<div class="flex gap-12">
+<div>
+<p class="text-on-surface-variant font-label text-xs font-bold tracking-widest uppercase mb-1">Call Duration</p>
+<p class="text-xl font-bold">14:22</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label text-xs font-bold tracking-widest uppercase mb-1">Status</p>
+<p class="text-xl font-bold text-secondary">SUCCESS</p>
+</div>
+</div>
+</div>
+<div class="bg-primary text-on-primary p-8 rounded-xl flex flex-col justify-between">
+<div>
+<p class="opacity-70 font-label text-xs font-bold tracking-widest uppercase mb-1">Audio Evidence</p>
+<h3 class="text-xl font-bold mb-4">Recording Saved</h3>
+</div>
+<button class="w-full bg-surface-container-lowest text-primary py-3 rounded-md font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all">
+<span class="material-symbols-outlined">play_circle</span>
+                        Play Recording
+                    </button>
+</div>
+</div>
+</div>
+<!-- Details Section -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-12">
+<!-- Analysis Column -->
+<div class="lg:col-span-3 space-y-12">
+<!-- Used Arguments -->
+<section>
+<h4 class="text-lg font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">gavel</span>
+                        Relentless Arguments Used
+                    </h4>
+<div class="space-y-4">
+<div class="p-5 bg-surface-container-low rounded-lg border-l-4 border-primary">
+<p class="font-bold text-primary mb-1">EU Regulation 261/2004</p>
+<p class="text-on-surface-variant text-sm">Cited mandatory compensation for cancellations under carrier control.</p>
+</div>
+<div class="p-5 bg-surface-container-low rounded-lg border-l-4 border-primary">
+<p class="font-bold text-primary mb-1">Unreasonable Delay Clause</p>
+<p class="text-on-surface-variant text-sm">Rebutted the "extraordinary circumstances" claim with weather data logs.</p>
+</div>
+<div class="p-5 bg-surface-container-low rounded-lg border-l-4 border-primary">
+<p class="font-bold text-primary mb-1">Final Escalation Notice</p>
+<p class="text-on-surface-variant text-sm">Initiated intent to file with national enforcement body (NEB).</p>
+</div>
+</div>
+</section>
+<!-- Full Transcript -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h4 class="text-lg font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">description</span>
+                            Full Transcript
+                        </h4>
+<button class="text-primary font-bold text-sm hover:underline">Download PDF</button>
+</div>
+<div class="bg-surface-container-lowest rounded-xl ghost-border overflow-hidden">
+<div class="max-h-[400px] overflow-y-auto p-6 space-y-6">
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full bg-primary flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold">KAM</div>
+<div>
+<p class="text-xs font-bold text-primary mb-1 uppercase tracking-tighter">Kamila AI • 00:05</p>
+<p class="text-on-surface-variant leading-relaxed">Good afternoon. I am calling on behalf of my client regarding booking LH456. Under EU 261, we are requesting the statutory €400 compensation for the 5-hour delay.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex-shrink-0 flex items-center justify-center text-on-surface-variant text-[10px] font-bold">OPS</div>
+<div>
+<p class="text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-tighter">Operator • 00:42</p>
+<p class="text-on-surface-variant leading-relaxed">I see the delay, however, our records indicate it was due to air traffic control restrictions, which are considered extraordinary circumstances.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full bg-primary flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold">KAM</div>
+<div>
+<p class="text-xs font-bold text-primary mb-1 uppercase tracking-tighter">Kamila AI • 01:15</p>
+<p class="text-on-surface-variant leading-relaxed">Incorrect. While there were restrictions, Lufthansa flight LH458 departed on time from the same gate 20 minutes later. This indicates the issue was specific to the aircraft's technical readiness, not ATC.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex-shrink-0 flex items-center justify-center text-on-surface-variant text-[10px] font-bold">OPS</div>
+<div>
+<p class="text-xs font-bold text-on-surface-variant mb-1 uppercase tracking-tighter">Operator • 05:20</p>
+<p class="text-on-surface-variant leading-relaxed">One moment... (silence) ...Apologies, you are correct. I will process the refund now.</p>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-high text-center">
+<button class="text-on-surface font-bold text-sm">Expand full transcript</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar Column -->
+<div class="lg:col-span-2 space-y-8">
+<!-- Share Options -->
+<div class="bg-surface-container-high p-8 rounded-xl">
+<h5 class="font-bold mb-4">Share your win</h5>
+<p class="text-sm text-on-surface-variant mb-6">"Kamila saved me €400 from Lufthansa! 🎉 Legal automation is here."</p>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-2 bg-white p-3 rounded-lg ghost-border font-bold text-xs hover:bg-slate-50 transition-all">
+<span class="material-symbols-outlined text-base">share</span> Twitter
+                        </button>
+<button class="flex items-center justify-center gap-2 bg-white p-3 rounded-lg ghost-border font-bold text-xs hover:bg-slate-50 transition-all">
+<span class="material-symbols-outlined text-base">content_copy</span> Copy Link
+                        </button>
+</div>
+</div>
+<!-- Next Steps / Actions -->
+<div class="space-y-4">
+<h5 class="font-bold px-2">Next Steps</h5>
+<div class="group flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl ghost-border hover:bg-primary hover:text-white transition-all cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined p-2 bg-surface-container-low rounded-lg group-hover:bg-primary-container">account_balance</span>
+<div>
+<p class="font-bold text-sm">Verify Bank Details</p>
+<p class="text-xs opacity-70">Ensure refund lands safely</p>
+</div>
+</div>
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+<div class="group flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl ghost-border hover:bg-primary hover:text-white transition-all cursor-pointer">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined p-2 bg-surface-container-low rounded-lg group-hover:bg-primary-container">history</span>
+<div>
+<p class="font-bold text-sm">View Dispute History</p>
+<p class="text-xs opacity-70">Track all active claims</p>
+</div>
+</div>
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+<!-- Escalation / Failure Tips (Hidden by default, shown if needed) -->
+<div class="p-6 bg-error-container/30 rounded-xl border border-error/10">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-error">warning</span>
+<div>
+<p class="font-bold text-error mb-1">Didn't get the full amount?</p>
+<p class="text-xs text-on-error-container leading-relaxed mb-4">If the carrier offered less than €400, you can escalate via the National Enforcement Body (NEB).</p>
+<button class="bg-error text-on-error px-4 py-2 rounded-md text-xs font-bold hover:opacity-90 transition-all">Escalate Now</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-slate-950 font-['Inter'] text-sm text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 full-width py-12 px-6 mt-12">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 max-w-7xl mx-auto w-full">
+<div class="text-lg font-bold text-blue-900 dark:text-white">Kamila</div>
+<p class="">© 2024 Kamila AI. Credits: ElevenLabs, Firecrawl.</p>
+<div class="flex gap-6">
+<a class="hover:text-blue-600 dark:hover:text-blue-300 underline underline-offset-4 transition-colors duration-200" href="#">GitHub</a>
+<a class="hover:text-blue-600 dark:hover:text-blue-300 underline underline-offset-4 transition-colors duration-200" href="#">Twitter</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Call History - Kamila AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-secondary-container": "#00714d",
+                "secondary": "#006c49",
+                "error": "#ba1a1a",
+                "surface": "#faf8ff",
+                "on-tertiary": "#ffffff",
+                "surface-dim": "#d2d9f4",
+                "tertiary-fixed": "#ffddb8",
+                "surface-bright": "#faf8ff",
+                "inverse-on-surface": "#eef0ff",
+                "on-surface": "#131b2e",
+                "on-error-container": "#93000a",
+                "on-error": "#ffffff",
+                "on-tertiary-container": "#ffd29e",
+                "surface-container-highest": "#dae2fd",
+                "surface-container-low": "#f2f3ff",
+                "inverse-primary": "#b2c5ff",
+                "on-primary-fixed": "#001847",
+                "surface-container": "#eaedff",
+                "secondary-fixed": "#6ffbbe",
+                "secondary-fixed-dim": "#4edea3",
+                "on-primary-fixed-variant": "#0040a1",
+                "on-secondary-fixed-variant": "#005236",
+                "on-secondary-fixed": "#002113",
+                "outline": "#737785",
+                "outline-variant": "#c3c6d6",
+                "surface-variant": "#dae2fd",
+                "tertiary-container": "#865400",
+                "error-container": "#ffdad6",
+                "surface-container-high": "#e2e7ff",
+                "surface-container-lowest": "#ffffff",
+                "on-secondary": "#ffffff",
+                "on-background": "#131b2e",
+                "inverse-surface": "#283044",
+                "on-primary-container": "#ccd8ff",
+                "surface-tint": "#0056d2",
+                "background": "#faf8ff",
+                "tertiary-fixed-dim": "#ffb95f",
+                "primary-fixed-dim": "#b2c5ff",
+                "primary-fixed": "#dae2ff",
+                "on-tertiary-fixed-variant": "#653e00",
+                "on-tertiary-fixed": "#2a1700",
+                "tertiary": "#663f00",
+                "on-surface-variant": "#424654",
+                "secondary-container": "#6cf8bb",
+                "primary-container": "#0056d2",
+                "primary": "#0040a1",
+                "on-primary": "#ffffff"
+              },
+              fontFamily: {
+                "headline": ["Inter"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0040a1 0%, #0056d2 100%);
+        }
+        .ghost-border {
+            border: 1px solid rgba(195, 198, 214, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 font-body text-on-background min-h-screen">
+<!-- SideNavBar (Desktop Only) -->
+<aside class="hidden md:flex flex-col h-full border-r border-slate-200/15 dark:border-slate-800/15 h-screen w-64 fixed left-0 top-0 bg-slate-50 dark:bg-slate-950 z-40">
+<div class="px-6 py-8">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center text-white shadow-lg">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<div>
+<h1 class="text-blue-800 dark:text-blue-300 font-black text-lg Inter">Kamila AI</h1>
+<p class="text-[10px] uppercase tracking-widest font-semibold text-slate-500">The Relentless Advocate</p>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:translate-x-1 transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-xs uppercase tracking-widest font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-r-4 border-blue-700 dark:border-blue-500 hover:translate-x-1 transition-transform duration-200 rounded-l-lg" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="text-xs uppercase tracking-widest font-semibold">Call History</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:translate-x-1 transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="play_circle">play_circle</span>
+<span class="text-xs uppercase tracking-widest font-semibold">Live Demo</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900 hover:translate-x-1 transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span class="text-xs uppercase tracking-widest font-semibold">Legal Vault</span>
+</a>
+</nav>
+<div class="mt-10">
+<button class="w-full bg-gradient-primary text-on-primary py-3 rounded-md font-bold shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                    Start New Call
+                </button>
+</div>
+</div>
+<div class="mt-auto px-6 py-8 border-t border-slate-200/15 dark:border-slate-800/15">
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 text-xs font-semibold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                    Support
+                </a>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 text-xs font-semibold uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+                    Account
+                </a>
+</nav>
+</div>
+</aside>
+<!-- TopNavBar (Mobile Only) -->
+<header class="md:hidden fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/15 dark:border-slate-800/15 shadow-sm">
+<div class="flex items-center justify-between px-6 py-3">
+<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-50">Kamila AI</span>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-500" data-icon="notifications">notifications</span>
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="Close-up of professional user avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCblK6yV9X6BjhZ1JdkRiHejWfK7CGhk2eMk5R8_kyIpZEDW0K3pTSuZYsl4-wNBSeCJbopjMqGI1RYhQUdA732fFJncDm6VscP4jWePNpFPxAaDF3Ch59AYWsn03nTP7hxe-7RlYfidfaNBvjVyaGkLZKIUOnbvHtdudPaS3oxu5XxxK4TauZXKTHQMQ4d7yZVJNE8i917u63rsMYTCto8934-TGWjt-4Jg_unTwIkJ4ucE1zVClC_EZefEmsFr2Oxr_Z4Im1jTwiC"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="md:ml-64 pt-20 md:pt-0 min-h-screen pb-24 md:pb-12">
+<!-- Dashboard Header / Stats -->
+<div class="px-6 md:px-12 py-10">
+<header class="mb-10">
+<h2 class="text-3xl md:text-4xl font-black text-on-surface -tracking-[0.02em] mb-2">History</h2>
+<p class="text-on-surface-variant font-medium">Review your relentless advocacy outcomes.</p>
+</header>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<div class="bg-surface-container-low p-8 rounded-xl shadow-sm border border-transparent">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">Total Calls</p>
+<div class="flex items-end gap-2">
+<span class="text-5xl font-black text-on-surface">3</span>
+<span class="text-blue-600 font-bold mb-1">calls made</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-8 rounded-xl shadow-sm border border-transparent">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">Success Rate</p>
+<div class="flex items-end gap-2">
+<span class="text-5xl font-black text-secondary">2</span>
+<span class="text-secondary font-bold mb-1">successful</span>
+</div>
+</div>
+<div class="bg-gradient-primary p-8 rounded-xl shadow-lg">
+<p class="text-xs font-bold uppercase tracking-widest text-on-primary-container mb-4 opacity-80">Total Recovered</p>
+<div class="flex items-end gap-2">
+<span class="text-5xl font-black text-on-primary">€540</span>
+<span class="text-on-primary font-bold mb-1 opacity-90">to date</span>
+</div>
+</div>
+</div>
+<!-- List of History Cards -->
+<div class="space-y-6">
+<!-- SUCCESS Card -->
+<article class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_20px_40px_rgba(19,27,46,0.04)] ghost-border hover:translate-y-[-2px] transition-transform duration-300">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+<div class="flex items-start gap-5">
+<div class="w-16 h-16 rounded-lg bg-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden">
+<img alt="Lufthansa logo" class="w-full h-full object-contain" data-alt="Minimalist abstract airline corporate logo design" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCf6uV5YTQMjfuTRzG7CxeA1T6YVt91BFwMzGu0RjkK9bcLk9UlI-eVbsoiDJmQ-V-IputspfBeFJ2VpwXOTzUJ8ceCk7Rji4SS33Gr-SAggyIyyyA2JdFT0R6Vz2jUOBrDQSY7Nj6Y2WnsoqRHT1dFcmvVggMUEPydG3AdguaWChDwthhHXBetxiMqDyvS7X1_ZxAW7jcEiMSLgIeEZjfCWzNaxgbTvT7aWRAUBUctBmExoOq8klp8tDPjmVikEGLYf5m-yLtW4jat"/>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-3">
+<h3 class="text-xl font-bold text-on-surface">Lufthansa</h3>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider rounded-full">SUCCESS</span>
+</div>
+<p class="text-sm text-on-surface-variant">March 12, 2024</p>
+<p class="text-on-surface font-medium mt-2 italic">"Flight LH2044 delay compensation request for 4-hour arrival variance."</p>
+</div>
+</div>
+<div class="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-100 pt-6 lg:pt-0 lg:pl-8">
+<div class="text-right">
+<p class="text-xs font-bold uppercase tracking-tighter text-on-surface-variant opacity-60">Amount Recovered</p>
+<p class="text-3xl font-black text-blue-700">€400</p>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 bg-surface-container-high text-on-surface font-bold text-sm rounded-md ghost-border hover:bg-surface-container-highest transition-colors">View details</button>
+<button class="px-5 py-2.5 bg-gradient-primary text-on-primary font-bold text-sm rounded-md shadow-sm hover:opacity-90 transition-opacity">Call again</button>
+</div>
+</div>
+</div>
+</article>
+<!-- PARTIAL Card -->
+<article class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_20px_40px_rgba(19,27,46,0.04)] ghost-border hover:translate-y-[-2px] transition-transform duration-300">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+<div class="flex items-start gap-5">
+<div class="w-16 h-16 rounded-lg bg-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden">
+<img alt="Vodafone logo" class="w-full h-full object-contain" data-alt="Modern telecom service provider brand mark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4r81yKF3VRBmWjo6OdFp47qeUbm-4hwAN33dS2WOL6mNUN4etHfZuU6CzDN_LDFTTpnpjJz9PF05Je8boVP7rNx9VbgjOs6jyeLGjsamt0OUR0PkwRX4Dhy0DwKldArXyfoWF9L43ciQo70X3q0SUDTksijmGYZvV3Dsfr-dxbPiWY9de-Kuf6QBIq8wytnUsU6OktrZQkUerr3ZolCQCz3ktOaXD7gAoD33ZDZHU2s2Gns3E8hyVAJoIQ322In7vm1FLfeuW4zst"/>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-3">
+<h3 class="text-xl font-bold text-on-surface">Vodafone</h3>
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-bold uppercase tracking-wider rounded-full">PARTIAL</span>
+</div>
+<p class="text-sm text-on-surface-variant">February 28, 2024</p>
+<p class="text-on-surface font-medium mt-2 italic">"Disputed international roaming charges while on holiday in Switzerland."</p>
+</div>
+</div>
+<div class="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-100 pt-6 lg:pt-0 lg:pl-8">
+<div class="text-right">
+<p class="text-xs font-bold uppercase tracking-tighter text-on-surface-variant opacity-60">Amount Recovered</p>
+<p class="text-3xl font-black text-blue-700">€140</p>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 bg-surface-container-high text-on-surface font-bold text-sm rounded-md ghost-border hover:bg-surface-container-highest transition-colors">View details</button>
+<button class="px-5 py-2.5 bg-gradient-primary text-on-primary font-bold text-sm rounded-md shadow-sm hover:opacity-90 transition-opacity">Call again</button>
+</div>
+</div>
+</div>
+</article>
+<!-- FAILED Card -->
+<article class="bg-surface-container-lowest p-6 rounded-xl shadow-[0_20px_40px_rgba(19,27,46,0.04)] ghost-border opacity-70 hover:opacity-100 transition-opacity">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+<div class="flex items-start gap-5">
+<div class="w-16 h-16 rounded-lg bg-slate-100 flex items-center justify-center p-2 shrink-0 overflow-hidden">
+<img alt="Delta logo" class="w-full h-full object-contain grayscale" data-alt="Blue and red delta symbol for aviation brand" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0F1lLCWemi6JHFCNg73Jna63FUKEfT3v3YLm8OzpAlX3hqlXGLQ5-3COPwQbQeCMrkfHu4ppN97xjIVTjhkJDAIecsnoYeLEwhrPIl-HmxKhsnKNaYNporHmZJp13DKOHCdHxkTtLvGm1sqvEcYn4VkZ_0L_KKJKigsS8fPZkhxy5z4M2ajsOiBDxrt7r8TpX3fpJRj7q3Srr6d3ptZWfysVjzfiDKHqqNEIqbh6Tvb5tmcxJ7isI-ckcZELl_B-nM9XEkd_xFqxD"/>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-3">
+<h3 class="text-xl font-bold text-on-surface">Delta Air Lines</h3>
+<span class="px-3 py-1 bg-error-container text-on-error-container text-[10px] font-bold uppercase tracking-wider rounded-full">FAILED</span>
+</div>
+<p class="text-sm text-on-surface-variant">January 15, 2024</p>
+<p class="text-on-surface font-medium mt-2 italic">"Baggage handling delay claim for flight DL012 to JFK."</p>
+</div>
+</div>
+<div class="flex flex-row lg:flex-col items-center lg:items-end justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-100 pt-6 lg:pt-0 lg:pl-8">
+<div class="text-right">
+<p class="text-xs font-bold uppercase tracking-tighter text-on-surface-variant opacity-60">Amount Recovered</p>
+<p class="text-3xl font-black text-slate-400">€0</p>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 bg-surface-container-high text-on-surface font-bold text-sm rounded-md ghost-border hover:bg-surface-container-highest transition-colors">View details</button>
+<button class="px-5 py-2.5 bg-gradient-primary text-on-primary font-bold text-sm rounded-md shadow-sm hover:opacity-90 transition-opacity">Call again</button>
+</div>
+</div>
+</div>
+</article>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-safe md:hidden bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200/10 dark:border-slate-800/10 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-2xl z-50">
+<a class="flex flex-col items-center justify-center text-blue-700 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/30 rounded-xl px-3 py-1 scale-95 transition-transform duration-75" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 active:bg-slate-100 dark:active:bg-slate-800 scale-95 transition-transform duration-75" href="#">
+<span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Demo</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 active:bg-slate-100 dark:active:bg-slate-800 scale-95 transition-transform duration-75" href="#">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Vault</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 active:bg-slate-100 dark:active:bg-slate-800 scale-95 transition-transform duration-75" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Profile</span>
+</a>
+</nav>
+</body></html>

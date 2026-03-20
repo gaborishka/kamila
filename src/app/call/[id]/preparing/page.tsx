@@ -1,0 +1,189 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useCallStatus } from "@/hooks/useCallStatus";
+import Footer from "@/components/Footer";
+
+export default function PreparingPage() {
+  const params = useParams();
+  const router = useRouter();
+  const callId = params.id as string;
+  const { call, loading } = useCallStatus(callId);
+  const prepStarted = useRef(false);
+  const [prepError, setPrepError] = useState("");
+
+  // Trigger preparation pipeline
+  useEffect(() => {
+    if (!callId || prepStarted.current) return;
+    prepStarted.current = true;
+
+    async function startPreparation() {
+      try {
+        const prepRes = await fetch(`/api/calls/${callId}/prepare`, { method: "POST" });
+        if (!prepRes.ok) {
+          setPrepError("Failed to prepare case. Please try again.");
+          return;
+        }
+        const dialRes = await fetch(`/api/calls/${callId}/dial`, { method: "POST" });
+        if (!dialRes.ok) {
+          setPrepError("Failed to initiate call. Please try again.");
+          return;
+        }
+      } catch (error) {
+        console.error("Preparation failed:", error);
+        setPrepError("Something went wrong. Please try again.");
+      }
+    }
+
+    startPreparation();
+  }, [callId]);
+
+  // Auto-redirect when call goes live
+  useEffect(() => {
+    if (call?.status === "live") {
+      router.push(`/call/${callId}/live`);
+    }
+    if (call?.status === "completed") {
+      router.push(`/call/${callId}/result`);
+    }
+  }, [call?.status, callId, router]);
+
+  const prepSteps = call?.prepSteps || [
+    { id: "tos", label: "Reading their Terms of Service...", status: "pending", snippet: null },
+    { id: "reddit", label: "Searching for refund strategies...", status: "pending", snippet: null },
+    { id: "legal", label: "Finding legal requirements...", status: "pending", snippet: null },
+    { id: "building", label: "Building your case...", status: "pending", snippet: null },
+    { id: "dialing", label: "Dialing...", status: "pending", snippet: null },
+  ];
+
+  const completedSteps = prepSteps.filter((s: { status: string }) => s.status === "complete").length;
+  const progress = (completedSteps / prepSteps.length) * 100;
+
+  return (
+    <>
+      <header className="bg-slate-50/80 backdrop-blur-md border-b border-slate-200/20 shadow-sm fixed top-0 w-full z-50">
+        <div className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
+          <span className="text-2xl font-black tracking-tighter text-blue-900">Kamila</span>
+          <div className="flex items-center gap-2 px-3 py-1 bg-surface-container-high rounded-full">
+            <span className="material-symbols-outlined text-sm text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>security</span>
+            <span className="text-[10px] uppercase tracking-widest font-bold text-primary">Secure Session</span>
+          </div>
+        </div>
+      </header>
+
+      <main className="min-h-screen flex flex-col items-center justify-center px-6 pt-20">
+        <div className="max-w-3xl w-full">
+          {/* Hero */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-xl bg-gradient-to-br from-primary to-primary-container shadow-xl mb-8 relative">
+              <span className="material-symbols-outlined text-on-primary text-4xl">cognition</span>
+              <div className="absolute inset-0 rounded-xl border-2 border-primary/30 step-pulse"></div>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-4">
+              Preparing your case
+            </h1>
+            <p className="text-on-surface-variant text-lg">
+              Kamila is analyzing legal precedents and company policies.
+            </p>
+          </div>
+
+          {/* Bento Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
+            {/* Left: Steps */}
+            <div className="md:col-span-7 space-y-4">
+              <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0_20px_40px_rgba(19,27,46,0.04)] border border-outline-variant/15">
+                <h2 className="text-[10px] uppercase tracking-[0.1em] font-bold text-outline mb-6">
+                  Relentless Strategy Engine
+                </h2>
+                <div className="space-y-6">
+                  {prepSteps.map((step: { id: string; label: string; status: string; snippet?: string | null }) => (
+                    <div key={step.id} className={`flex items-start gap-4 ${step.status === "pending" ? "opacity-40" : ""}`}>
+                      <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center" style={{
+                        backgroundColor:
+                          step.status === "complete" ? "#006c49" :
+                          step.status === "active" ? "#0056d2" : "#c3c6d6",
+                      }}>
+                        {step.status === "complete" ? (
+                          <span className="material-symbols-outlined text-[14px] text-white" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
+                        ) : step.status === "active" ? (
+                          <div className="w-2 h-2 rounded-full bg-white step-pulse"></div>
+                        ) : null}
+                      </div>
+                      <div>
+                        <p className={`text-sm ${step.status === "active" ? "font-bold text-primary" : "font-semibold text-on-surface"}`}>
+                          {step.label}
+                        </p>
+                        {step.snippet && step.status === "complete" && (
+                          <div className="mt-2 p-3 bg-surface-container-low rounded-lg border-l-4 border-secondary">
+                            <p className="text-xs font-mono text-secondary leading-relaxed">{step.snippet}</p>
+                          </div>
+                        )}
+                        {step.status === "active" && (
+                          <div className="flex gap-1 mt-2">
+                            <div className="h-1 w-8 bg-primary rounded-full"></div>
+                            <div className="h-1 w-8 bg-surface-variant rounded-full overflow-hidden">
+                              <div className="h-full bg-primary w-1/2 animate-pulse"></div>
+                            </div>
+                            <div className="h-1 w-8 bg-surface-variant rounded-full"></div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Metadata */}
+            <div className="md:col-span-5 space-y-6">
+              <div className="bg-primary text-on-primary p-6 rounded-xl shadow-lg relative overflow-hidden">
+                <div className="relative z-10">
+                  <h3 className="text-[10px] uppercase tracking-widest font-bold text-on-primary/60 mb-2">Estimated Prep Time</h3>
+                  <div className="text-4xl font-black mb-4">20s</div>
+                  <div className="w-full bg-on-primary/20 h-2 rounded-full mb-2">
+                    <div className="bg-secondary-fixed h-full rounded-full shadow-[0_0_8px_rgba(111,251,190,0.5)] transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                  </div>
+                  <p className="text-xs text-on-primary/80">Kamila is optimizing for the shortest hold time.</p>
+                </div>
+                <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-primary-container rounded-full blur-3xl opacity-50"></div>
+              </div>
+
+              <div className="bg-surface-container p-6 rounded-xl border border-outline-variant/15">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="material-symbols-outlined text-tertiary">gavel</span>
+                  <span className="text-xs font-bold uppercase tracking-tight text-on-surface">Legal Insight</span>
+                </div>
+                <p className="text-sm text-on-surface-variant leading-relaxed italic">
+                  &quot;Most consumers give up after 12 minutes of hold time. Kamila&apos;s automated persistence engine maintains the line for you indefinitely.&quot;
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_rgba(0,108,73,0.4)]"></div>
+                  <span className="text-xs font-semibold text-on-surface">Secure AI Link</span>
+                </div>
+                <span className="text-[10px] font-mono text-outline">ENCRYPTED:AES-256</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center text-outline text-xs max-w-md mx-auto">
+            <p>Do not close this window. Kamila will notify you the moment the representative joins the call.</p>
+          </div>
+          {prepError && (
+            <div className="mt-8 text-center">
+              <p className="text-error font-bold mb-4">{prepError}</p>
+              <a href="/call/new" className="inline-block bg-primary text-on-primary px-6 py-3 rounded-md font-bold">
+                Try Again
+              </a>
+            </div>
+          )}
+        </div>
+      </main>
+
+      <Footer />
+    </>
+  );
+}

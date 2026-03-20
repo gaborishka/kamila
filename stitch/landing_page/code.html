@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-fixed": "#2a1700",
+              "inverse-on-surface": "#eef0ff",
+              "on-primary": "#ffffff",
+              "outline-variant": "#c3c6d6",
+              "background": "#faf8ff",
+              "surface": "#faf8ff",
+              "on-secondary-fixed-variant": "#005236",
+              "primary-fixed": "#dae2ff",
+              "secondary-fixed-dim": "#4edea3",
+              "surface-container-low": "#f2f3ff",
+              "on-error": "#ffffff",
+              "on-primary-fixed-variant": "#0040a1",
+              "surface-variant": "#dae2fd",
+              "surface-container-high": "#e2e7ff",
+              "inverse-primary": "#b2c5ff",
+              "on-background": "#131b2e",
+              "primary-fixed-dim": "#b2c5ff",
+              "on-surface": "#131b2e",
+              "surface-container-highest": "#dae2fd",
+              "on-primary-container": "#ccd8ff",
+              "surface-container": "#eaedff",
+              "primary": "#0040a1",
+              "secondary": "#006c49",
+              "on-error-container": "#93000a",
+              "primary-container": "#0056d2",
+              "on-tertiary": "#ffffff",
+              "inverse-surface": "#283044",
+              "tertiary": "#663f00",
+              "on-tertiary-fixed-variant": "#653e00",
+              "on-secondary-container": "#00714d",
+              "on-secondary": "#ffffff",
+              "secondary-fixed": "#6ffbbe",
+              "on-tertiary-container": "#ffd29e",
+              "error": "#ba1a1a",
+              "surface-tint": "#0056d2",
+              "surface-dim": "#d2d9f4",
+              "secondary-container": "#6cf8bb",
+              "on-primary-fixed": "#001847",
+              "surface-bright": "#faf8ff",
+              "tertiary-fixed-dim": "#ffb95f",
+              "surface-container-lowest": "#ffffff",
+              "error-container": "#ffdad6",
+              "on-surface-variant": "#424654",
+              "outline": "#737785",
+              "tertiary-container": "#865400",
+              "on-secondary-fixed": "#002113",
+              "tertiary-fixed": "#ffddb8"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: rgba(250, 248, 255, 0.8);
+        }
+        .text-editorial {
+            letter-spacing: -0.02em;
+        }
+        .ghost-border {
+            border: 1px solid rgba(195, 198, 214, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Shell -->
+<header class="bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm dark:shadow-none font-['Inter'] antialiased tracking-tight docked full-width top-0 sticky z-50 border-b border-slate-200/20 dark:border-slate-800/20">
+<nav class="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
+<div class="text-2xl font-black tracking-tighter text-blue-900 dark:text-white">Kamila</div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-all duration-200" href="#">History</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-5 py-2 rounded-md font-bold active:scale-[0.98] transition-transform shadow-sm">New Call</button>
+<div class="text-slate-500 dark:text-slate-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all duration-200 p-2 rounded-full cursor-pointer">
+<span class="material-symbols-outlined text-3xl">account_circle</span>
+</div>
+</div>
+</nav>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-20 pb-32 px-6">
+<div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-7 z-10">
+<span class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container text-xs font-bold uppercase tracking-wider rounded-full mb-6">
+                        The Digital Verdict
+                    </span>
+<h1 class="text-5xl lg:text-7xl font-headline font-black text-on-surface leading-[1.1] text-editorial mb-6">
+                        Stop wasting hours on hold. <span class="text-primary">Kamila calls for you.</span>
+</h1>
+<p class="text-xl text-on-surface-variant leading-relaxed max-w-2xl mb-10">
+                        Upload your receipt, describe the problem, and let AI fight for your refund. Finally, someone will solve this for me.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-4 rounded-md font-bold text-lg hover:shadow-lg transition-all active:scale-95">
+                            Get My Money Back
+                        </button>
+<div class="flex items-center gap-3 px-4">
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="User 1" class="w-full h-full object-cover" data-alt="Close up portrait of a satisfied customer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJmuVyehIvjROm4jZbA4r7TeoVvpAWAC0OlbVKdvVfznJDOfbyw8gASe0R6ylCupGJK5FGOroXX4GlXy5A-Tgmqowa-lMCJdc6ZoryCQMV9rHJNYXFCQdi-fB5qsCWxCCWP1vjEYKDtK29Nb6eqBfKSY2jlcTU8mvSwKa2CkQORK5D6Akm3RumuxXhrm_uPV5u9mQLAa7Bj04c2OEcuaj6VOk_uvu8-inL7lOIW8ZhRxYp-nIHoAO2EuRz1mq-lq7e2eo4zfS7nFAp"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img alt="User 2" class="w-full h-full object-cover" data-alt="Portrait of a professional man smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhLAjKIGb5GTMrV11YFzRYY1XSHg-dgrPNs-P4-qk8uyNYRvTaixenjPruKuCbsGce9aN8maqmxzY3L0AdlzKbIqzgVzLmzvccBww6gcAehyXWJti9R3MZQdT5FuyJulR3ZtROfebRFETuZUZzkm29g9wcZPSY6EPtQQIK756Xr2-e56yQ7wm_6Mi5K8q0w21vgo_rVRjSr3ZVC9ruxXrGHIsxnFZ3yIxrEqLOWQsxJmGC_fE8xPnOmWDm8zi4NNK__D1uavK1eDAR"/>
+</div>
+</div>
+<div class="text-sm">
+<div class="font-bold text-on-surface">247 refunds recovered</div>
+<div class="text-on-surface-variant">$12,400 saved this month</div>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5 relative">
+<!-- Bento Visual Concept -->
+<div class="relative w-full aspect-square">
+<div class="absolute inset-0 bg-primary/5 rounded-[2rem] transform rotate-3"></div>
+<div class="absolute inset-0 glass-panel ghost-border rounded-[2rem] p-8 flex flex-col justify-center items-center shadow-xl">
+<!-- Visual representation: phone -> AI -> money -->
+<div class="flex flex-col items-center gap-8 w-full max-w-xs">
+<div class="w-16 h-16 bg-surface-container-highest rounded-xl flex items-center justify-center text-primary-container shadow-sm">
+<span class="material-symbols-outlined text-4xl">phone_in_talk</span>
+</div>
+<div class="h-12 w-0.5 bg-gradient-to-b from-primary/20 to-primary"></div>
+<div class="w-24 h-24 bg-gradient-to-br from-primary to-primary-container rounded-2xl flex items-center justify-center text-on-primary shadow-2xl relative">
+<span class="material-symbols-outlined text-5xl">psychology</span>
+<div class="absolute -top-2 -right-2 w-6 h-6 bg-secondary rounded-full flex items-center justify-center border-2 border-surface shadow-md">
+<div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+</div>
+</div>
+<div class="h-12 w-0.5 bg-gradient-to-b from-primary to-secondary/40"></div>
+<div class="w-16 h-16 bg-secondary-container rounded-xl flex items-center justify-center text-on-secondary-container shadow-sm">
+<span class="material-symbols-outlined text-4xl">payments</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Social Proof Stats -->
+<section class="bg-surface-container-low py-12">
+<div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+<div class="text-center">
+<div class="text-3xl font-black text-primary mb-1">98%</div>
+<div class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Success Rate</div>
+</div>
+<div class="text-center">
+<div class="text-3xl font-black text-primary mb-1">2.4k</div>
+<div class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Active Cases</div>
+</div>
+<div class="text-center">
+<div class="text-3xl font-black text-primary mb-1">12m</div>
+<div class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Avg. Hold Time</div>
+</div>
+<div class="text-center">
+<div class="text-3xl font-black text-primary mb-1">100%</div>
+<div class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Relentless</div>
+</div>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="py-32 px-6">
+<div class="max-w-7xl mx-auto">
+<div class="mb-20 text-center max-w-3xl mx-auto">
+<h2 class="text-4xl font-headline font-black text-on-surface mb-4">A simple brief for your digital attorney</h2>
+<p class="text-on-surface-variant text-lg">Kamila doesn't just automate tasks; she executes strategies.</p>
+</div>
+<div class="grid md:grid-cols-3 gap-8">
+<!-- Step 1 -->
+<div class="group p-8 rounded-xl bg-surface-container-lowest ghost-border hover:shadow-2xl transition-all duration-300">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined font-bold">upload_file</span>
+</div>
+<div class="text-xs font-bold text-primary uppercase mb-2">Step 01</div>
+<h3 class="text-xl font-bold mb-4">Upload your receipt</h3>
+<p class="text-on-surface-variant leading-relaxed">Simply snap a photo or upload a screenshot. Kamila extracts every detail, policy, and deadline automatically.</p>
+</div>
+<!-- Step 2 -->
+<div class="group p-8 rounded-xl bg-surface-container-lowest ghost-border hover:shadow-2xl transition-all duration-300">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined font-bold">edit_note</span>
+</div>
+<div class="text-xs font-bold text-primary uppercase mb-2">Step 02</div>
+<h3 class="text-xl font-bold mb-4">Describe the problem</h3>
+<p class="text-on-surface-variant leading-relaxed">Tell her what went wrong in your own words. No legal jargon required. She converts your frustration into a formal case.</p>
+</div>
+<!-- Step 3 -->
+<div class="group p-8 rounded-xl bg-surface-container-lowest ghost-border hover:shadow-2xl transition-all duration-300">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined font-bold">call</span>
+</div>
+<div class="text-xs font-bold text-primary uppercase mb-2">Step 03</div>
+<h3 class="text-xl font-bold mb-4">Kamila gets to work</h3>
+<p class="text-on-surface-variant leading-relaxed">She stays on hold, talks to agents, cites terms of service, and gets your money back while you enjoy your coffee.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Why Kamila (Features) -->
+<section class="py-32 px-6 bg-on-surface text-surface relative overflow-hidden">
+<!-- Background Texture -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" data-alt="Subtle geometric dot pattern background" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
+<div class="max-w-7xl mx-auto relative z-10">
+<div class="grid lg:grid-cols-2 gap-20 items-center">
+<div>
+<h2 class="text-4xl lg:text-5xl font-black mb-10 leading-tight">Why Kamila is your <br/><span class="text-primary-fixed-dim">unstoppable advocate.</span></h2>
+<div class="space-y-8">
+<div class="flex gap-6">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<div>
+<h4 class="font-bold text-lg mb-2">Reads 50 pages of Terms of Service in seconds</h4>
+<p class="text-surface-variant/80">She knows the fine print better than the agents on the phone. Every loophole is identified.</p>
+</div>
+</div>
+<div class="flex gap-6">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<div>
+<h4 class="font-bold text-lg mb-2">Finds what worked for others on Reddit</h4>
+<p class="text-surface-variant/80">Collective intelligence at your service. She uses proven strategies from thousands of successful refund stories.</p>
+</div>
+</div>
+<div class="flex gap-6">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<div>
+<h4 class="font-bold text-lg mb-2">Stays calm, polite, and relentless</h4>
+<p class="text-surface-variant/80">No emotional burnout. She maintains professional pressure until the resolution is achieved.</p>
+</div>
+</div>
+<div class="flex gap-6">
+<div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<div>
+<h4 class="font-bold text-lg mb-2">Never gets tired of being on hold</h4>
+<p class="text-surface-variant/80">Infinite patience. She waits through the elevator music so you don't have to.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest/5 rounded-3xl p-1 shadow-inner">
+<div class="bg-surface-container-highest/10 p-8 rounded-[1.4rem] ghost-border">
+<!-- Relentless Timeline Component -->
+<div class="space-y-8">
+<div class="flex gap-4">
+<div class="relative">
+<div class="w-3 h-3 rounded-full bg-secondary shadow-[0_0_10px_rgba(0,108,73,0.5)] z-10 relative"></div>
+<div class="absolute top-3 bottom-[-32px] left-1.5 w-[2px] bg-surface-variant/30"></div>
+</div>
+<div>
+<div class="text-xs font-bold text-primary-fixed-dim uppercase tracking-widest mb-1">09:00 AM</div>
+<div class="font-bold text-white">Call Initiated with Airline</div>
+<div class="text-sm text-surface-variant/70 italic">Kamila: "Requesting supervisor regarding Section 4.2 flight delay..."</div>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="relative">
+<div class="w-3 h-3 rounded-full bg-tertiary shadow-[0_0_10px_rgba(102,63,0,0.5)] z-10 relative"></div>
+<div class="absolute top-3 bottom-[-32px] left-1.5 w-[2px] bg-surface-variant/30"></div>
+</div>
+<div>
+<div class="text-xs font-bold text-primary-fixed-dim uppercase tracking-widest mb-1">10:15 AM</div>
+<div class="font-bold text-white">Negotiation in Progress</div>
+<div class="text-sm text-surface-variant/70">"Currently on hold. Est. wait time: 42 mins."</div>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="relative">
+<div class="w-3 h-3 rounded-full bg-secondary shadow-[0_0_10px_rgba(0,108,73,0.5)] z-10 relative"></div>
+</div>
+<div>
+<div class="text-xs font-bold text-primary-fixed-dim uppercase tracking-widest mb-1">11:04 AM</div>
+<div class="font-bold text-secondary-fixed">Refund Approved: $428.50</div>
+<div class="text-sm text-surface-variant/70">Case closed. Transfer pending to original payment method.</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA Section -->
+<section class="py-32 px-6">
+<div class="max-w-5xl mx-auto bg-surface-container rounded-3xl p-12 lg:p-20 text-center relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32"></div>
+<div class="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full -ml-32 -mb-32"></div>
+<h2 class="text-4xl lg:text-6xl font-headline font-black mb-8 relative z-10">Stop the stress. <br/>Start your refund.</h2>
+<p class="text-xl text-on-surface-variant mb-12 max-w-2xl mx-auto relative z-10">Join 247+ users who have already reclaimed their time and money from stubborn corporations.</p>
+<button class="bg-primary text-on-primary px-10 py-5 rounded-md font-bold text-xl hover:shadow-xl hover:-translate-y-1 transition-all active:translate-y-0 relative z-10">
+                    Get My Money Back Now
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer Shell -->
+<footer class="bg-slate-50 dark:bg-slate-950 full-width py-12 px-6 border-t border-slate-200 dark:border-slate-800">
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 max-w-7xl mx-auto w-full">
+<div class="flex flex-col gap-2">
+<div class="text-lg font-bold text-blue-900 dark:text-white">Kamila AI</div>
+<p class="text-sm font-['Inter'] text-slate-500 dark:text-slate-400">© 2024 Kamila AI. Credits: ElevenLabs, Firecrawl.</p>
+</div>
+<div class="flex items-center gap-8">
+<a class="text-sm font-['Inter'] text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 underline underline-offset-4 transition-colors duration-200" href="#">GitHub</a>
+<a class="text-sm font-['Inter'] text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 underline underline-offset-4 transition-colors duration-200" href="#">Twitter</a>
+</div>
+</div>
+</footer>
+</body></html>
