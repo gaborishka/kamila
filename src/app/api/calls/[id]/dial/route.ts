@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminDb } from "@/lib/firebase-admin";
+import { prisma } from "@/lib/db";
 import { createAgent, initiateOutboundCall } from "@/lib/elevenlabs";
 
 export async function POST(
@@ -9,47 +9,43 @@ export async function POST(
   const { id } = await params;
 
   try {
-    const callRef = getAdminDb().collection("calls").doc(id);
-    const callDoc = await callRef.get();
+    const call = await prisma.call.findUnique({ where: { id } });
 
-    if (!callDoc.exists) {
+    if (!call) {
       return NextResponse.json({ error: "Call not found" }, { status: 404 });
     }
 
-    const callData = callDoc.data();
-    if (!callData) {
-      return NextResponse.json({ error: "Call data is empty" }, { status: 404 });
-    }
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const prepSteps = (call.prepSteps as { id: string; label: string; status: string; snippet: string | null }[]) || [];
 
     // Create ElevenLabs agent
     const agent = await createAgent({
-      companyName: callData.companyName,
-      tosData: callData.tosData || {},
-      redditTips: callData.redditTips || [],
-      consumerRights: callData.consumerRights || [],
+      companyName: call.companyName,
+      tosData: (call.tosData as Record<string, unknown>) || {},
+      redditTips: (call.redditTips as string[]) || [],
+      consumerRights: (call.consumerRights as string[]) || [],
       webhookUrl: appUrl,
     });
 
     // Initiate outbound call
     const callResult = await initiateOutboundCall({
       agentId: agent.agent_id,
-      toNumber: callData.supportPhone,
-      customerName: callData.customerName,
-      orderNumber: callData.orderNumber || "N/A",
-      problemDescription: callData.problemDescription,
+      toNumber: call.supportPhone,
+      customerName: call.customerName,
+      orderNumber: call.orderNumber || "N/A",
+      problemDescription: call.problemDescription,
     });
 
     // Update call status
-    await callRef.update({
-      status: "live",
-      agentId: agent.agent_id,
-      conversationId: callResult.conversation_id || null,
-      callStartedAt: Date.now(),
-      "prepSteps": callData.prepSteps.map((s: { id: string }) => ({
-        ...s,
-        status: "complete",
-      })),
+    await prisma.call.update({
+      where: { id },
+      data: {
+        status: "live",
+        agentId: agent.agent_id,
+        conversationId: callResult.conversation_id || null,
+        callStartedAt: new Date(),
+        prepSteps: prepSteps.map((s) => ({ ...s, status: "complete" })),
+      },
     });
 
     return NextResponse.json({ success: true, agentId: agent.agent_id });

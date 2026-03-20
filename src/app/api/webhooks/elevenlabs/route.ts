@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminDb } from "@/lib/firebase-admin";
+import { prisma } from "@/lib/db";
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.ELEVENLABS_WEBHOOK_SECRET;
   const authHeader = req.headers.get("x-webhook-secret") || req.nextUrl.searchParams.get("secret");
+
+  if (!webhookSecret) {
+    console.warn("ELEVENLABS_WEBHOOK_SECRET not set — webhook auth is disabled");
+  }
   if (webhookSecret && authHeader !== webhookSecret) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -11,32 +15,26 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Find the call by agent_id or conversation_id
+    // Find the call by conversation_id or agent_id
     const agentId = body.agent_id;
     const conversationId = body.conversation_id;
 
-    let callQuery;
+    let call;
     if (conversationId) {
-      callQuery = await getAdminDb()
-        .collection("calls")
-        .where("conversationId", "==", conversationId)
-        .limit(1)
-        .get();
-    } else if (agentId) {
-      callQuery = await getAdminDb()
-        .collection("calls")
-        .where("agentId", "==", agentId)
-        .limit(1)
-        .get();
+      call = await prisma.call.findFirst({
+        where: { conversationId },
+      });
+    }
+    if (!call && agentId) {
+      call = await prisma.call.findFirst({
+        where: { agentId },
+      });
     }
 
-    if (!callQuery || callQuery.empty) {
+    if (!call) {
       console.error("No matching call found for webhook");
       return NextResponse.json({ error: "Call not found" }, { status: 404 });
     }
-
-    const callDoc = callQuery.docs[0];
-    const callRef = callDoc.ref;
 
     // Parse webhook data
     const analysis = body.analysis || {};
@@ -54,36 +52,41 @@ export async function POST(req: NextRequest) {
       ? parseFloat(dataCollection.resolution_amount)
       : undefined;
 
-    // Store transcript messages
-    const batch = getAdminDb().batch();
-    for (const msg of transcript) {
-      const msgRef = callRef.collection("transcript").doc();
-      batch.set(msgRef, {
-        speaker: msg.role === "agent" ? "kamila" : "operator",
-        text: msg.message,
-        timestamp: msg.time_in_call_secs ? msg.time_in_call_secs * 1000 : Date.now(),
-        citedTos: msg.message?.toLowerCase().includes("terms of service") ||
-                  msg.message?.toLowerCase().includes("section") ||
-                  msg.message?.toLowerCase().includes("policy"),
-      });
+    // Store transcript (idempotent: delete existing + re-insert in transaction)
+    if (transcript.length > 0) {
+      await prisma.$transaction([
+        prisma.transcriptMessage.deleteMany({ where: { callId: call.id } }),
+        prisma.transcriptMessage.createMany({
+          data: transcript.map((msg: { role: string; message: string; time_in_call_secs?: number }) => ({
+            callId: call.id,
+            speaker: msg.role === "agent" ? "kamila" : "operator",
+            text: msg.message,
+            timestamp: msg.time_in_call_secs ? msg.time_in_call_secs * 1000 : Date.now(),
+            citedTos:
+              msg.message?.toLowerCase().includes("terms of service") ||
+              msg.message?.toLowerCase().includes("section") ||
+              msg.message?.toLowerCase().includes("policy"),
+          })),
+        }),
+      ]);
     }
-    await batch.commit();
 
     // Update call document
-    await callRef.update({
-      status: "completed",
-      callEndedAt: Date.now(),
-      result: {
-        type: resultType,
-        amount: resolutionAmount,
-        currency: "EUR",
+    await prisma.call.update({
+      where: { id: call.id },
+      data: {
+        status: "completed",
+        callEndedAt: new Date(),
+        resultType,
+        resultAmount: resolutionAmount,
+        resultCurrency: dataCollection.currency || "EUR",
         operatorName: dataCollection.operator_name || null,
         referenceNumber: dataCollection.reference_number || null,
-        summary: analysis.call_successful
+        resultSummary: analysis.call_successful
           ? `Resolution achieved: ${resolutionType.replace("_", " ")}`
           : `Call ended without full resolution. Suggested next step: escalation.`,
+        audioUrl: body.recording_url || null,
       },
-      audioUrl: body.recording_url || null,
     });
 
     return NextResponse.json({ success: true });

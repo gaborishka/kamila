@@ -1,43 +1,47 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { TranscriptMessage } from "@/types/call";
 
-export function useTranscript(callId: string) {
+export function useTranscript(callId: string, callStatus?: string) {
   const [messages, setMessages] = useState<TranscriptMessage[]>([]);
   const [loading, setLoading] = useState(true);
+  const statusRef = useRef(callStatus);
+  statusRef.current = callStatus;
+
+  const fetchTranscript = useCallback(async () => {
+    if (!callId) return;
+    try {
+      const res = await fetch(`/api/calls/${callId}/transcript`);
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data);
+      }
+    } catch (error) {
+      console.error("Error fetching transcript:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [callId]);
 
   useEffect(() => {
-    if (!callId || !db) {
+    if (!callId) {
       setLoading(false);
       return;
     }
 
-    const q = query(
-      collection(db, "calls", callId, "transcript"),
-      orderBy("timestamp", "asc")
-    );
+    fetchTranscript();
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const msgs = snapshot.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        })) as TranscriptMessage[];
-        setMessages(msgs);
-        setLoading(false);
-      },
-      (error) => {
-        console.error("Error listening to transcript:", error);
-        setLoading(false);
-      }
-    );
+    // Only poll while call is active
+    if (statusRef.current === "completed") return;
 
-    return () => unsubscribe();
-  }, [callId]);
+    const interval = setInterval(() => {
+      if (statusRef.current === "completed") return;
+      fetchTranscript();
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [callId, fetchTranscript, callStatus]);
 
   return { messages, loading };
 }

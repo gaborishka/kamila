@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Call {
+  id                 String    @id @default(cuid())
+  status             String    @default("preparing")
+  companyName        String
+  companyUrl         String?
+  supportPhone       String
+  problemDescription String
+  customerName       String
+  orderNumber        String?
+  fileUrl            String?
+
+  tosData            Json?
+  redditTips         Json?     // String[]
+  consumerRights     Json?     // String[]
+  arguments          Json?     // Argument[]
+  prepSteps          Json?     // PrepStep[]
+  strategy           String?
+
+  agentId            String?
+  conversationId     String?
+
+  resultType         String?
+  resultAmount       Float?
+  resultCurrency     String?
+  operatorName       String?
+  referenceNumber    String?
+  resultSummary      String?
+
+  audioUrl           String?
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  callStartedAt      DateTime?
+  callEndedAt        DateTime?
+
+  transcript         TranscriptMessage[]
+}
+
+model TranscriptMessage {
+  id        String  @id @default(cuid())
+  callId    String
+  call      Call    @relation(fields: [callId], references: [id], onDelete: Cascade)
+  speaker   String
+  text      String
+  timestamp Float
+  citedTos  Boolean @default(false)
+
+  @@index([callId])
+}

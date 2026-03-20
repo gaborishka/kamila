@@ -11,7 +11,7 @@ export default function LiveCallPage() {
   const router = useRouter();
   const callId = params.id as string;
   const { call } = useCallStatus(callId);
-  const { messages } = useTranscript(callId);
+  const { messages } = useTranscript(callId, call?.status);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const [callDuration, setCallDuration] = useState(0);
   const [mounted, setMounted] = useState(false);

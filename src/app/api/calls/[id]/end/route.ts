@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminDb } from "@/lib/firebase-admin";
+import { prisma } from "@/lib/db";
 
 export async function POST(
   req: NextRequest,
@@ -8,16 +8,18 @@ export async function POST(
   const { id } = await params;
 
   try {
-    const callRef = getAdminDb().collection("calls").doc(id);
-    const callDoc = await callRef.get();
+    const call = await prisma.call.findUnique({ where: { id } });
 
-    if (!callDoc.exists) {
+    if (!call) {
       return NextResponse.json({ error: "Call not found" }, { status: 404 });
     }
 
-    await callRef.update({
-      status: "completed",
-      callEndedAt: Date.now(),
+    await prisma.call.update({
+      where: { id },
+      data: {
+        status: "completed",
+        callEndedAt: new Date(),
+      },
     });
 
     return NextResponse.json({ success: true });

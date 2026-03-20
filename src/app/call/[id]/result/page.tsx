@@ -11,7 +11,7 @@ export default function ResultPage() {
   const params = useParams();
   const callId = params.id as string;
   const { call, loading } = useCallStatus(callId);
-  const { messages } = useTranscript(callId);
+  const { messages } = useTranscript(callId, call?.status);
 
   if (loading) {
     return (

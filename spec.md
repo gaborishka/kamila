@@ -40,7 +40,7 @@ AI дзвонить у підтримку замість тебе, знаючи 
   - **Personalization / Dynamic Variables**: ім'я клієнта, номер замовлення, опис проблеми передаються як змінні при старті розмови (не хардкод в промпт)
   - **Conversation Analysis**: evaluation criteria "чи отримано refund/рішення"
   - **Data Collection**: витягує результат розмови, суму refund, ім'я оператора
-  - **Post-call Webhook**: результат → Firestore
+  - **Post-call Webhook**: результат → Vercel Postgres
 - Twilio **Outbound Call API** ініціює дзвінок на номер підтримки
 
 **Під час дзвінка:**
@@ -48,13 +48,13 @@ AI дзвонить у підтримку замість тебе, знаючи 
 - Якщо оператор відмовляє — агент цитує конкретні пункти Terms of Service (з JSON Extract даних)
 - Якщо оператор викручується — агент має контраргументи з Reddit та законодавства
 - Firecrawl Search доступний як **server tool** для пошуку додаткової інфо в реальному часі
-- **Events API** від ElevenLabs стрімить транскрипт → Firestore → UI оновлюється live
+- **ElevenLabs React SDK** на клієнті відображає live транскрипт через Events API
 - Транскрипт підсвічує коли Kamila цитує Terms of Service (фронтенд парсить JSON extract ключі)
 
 **Після дзвінка:**
 - **Post-call Webhook**: summary, результат (success/partial/failed), зібрані дані
 - **Conversation Analysis**: автоматична оцінка чи було досягнуто цілі
-- Все в Firestore → Result page з повним розбором
+- Все в Vercel Postgres → Result page з повним розбором
 
 ---
 
@@ -100,17 +100,15 @@ AI дзвонить у підтримку замість тебе, знаючи 
 
 | Компонент | Технологія | Навіщо |
 |-----------|-----------|--------|
-| Frontend | Next.js (App Router) на Vercel | UI |
-| Backend | Firebase Cloud Functions | Twilio webhooks, Firecrawl calls, agent creation |
-| Real-time | Firestore real-time listeners | Live транскрипт без WebSocket |
-| Storage | Firebase Storage | Чеки, файли, аудіо записи |
-| Database | Firestore | Дзвінки, транскрипти, результати |
-| Auth | Firebase Auth (якщо потрібно) | Опціонально для MVP |
+| Frontend + Backend | Next.js (App Router) на Vercel | UI + API routes |
+| Database | Vercel Postgres (Prisma ORM) | Дзвінки, транскрипти, результати |
+| Storage | Vercel Blob | Чеки, файли, аудіо записи |
+| Real-time транскрипт | ElevenLabs React SDK + Events API | Live транскрипт на клієнті |
 | Парсинг сайтів | Firecrawl JSON Extract + Actions | Terms of Service як структуровані дані |
 | Пошук аргументів | Firecrawl Search API | Reddit, права споживача, прецеденти |
 | Голосовий AI | ElevenLabs Agents API | Створення агентів програматично |
 | Телефонія | Twilio | Outbound дзвінки |
-| Деплой | Vercel (frontend) + Firebase (backend) | Розділення відповідальності |
+| Деплой | Vercel (single deploy) | Все в одному місці |
 
 ### Env variables
 ```
@@ -119,8 +117,9 @@ ELEVENLABS_API_KEY=xi-...
 TWILIO_ACCOUNT_SID=AC...
 TWILIO_AUTH_TOKEN=...
 TWILIO_PHONE_NUMBER=+1...
-FIREBASE_PROJECT_ID=...
-FIREBASE_SERVICE_ACCOUNT=...
+POSTGRES_URL=postgres://...
+POSTGRES_URL_NON_POOLING=postgres://...
+BLOB_READ_WRITE_TOKEN=vercel_blob_...
 ```
 
 ---
@@ -274,9 +273,9 @@ const results = await firecrawl.search(query, {
 |-------|-------------------|-------------------|
 | Conversation Analysis | Автоматична оцінка результату | Замінює ручну перевірку |
 | Data Collection | Витяг resolution type, amount | Платформа сама структурує дані |
-| Post-call Webhooks | Firestore sync | Автоматизує post-call flow |
+| Post-call Webhooks | Vercel Postgres sync | Автоматизує post-call flow |
 | Dynamic Variables | Ім'я, замовлення, проблема | Один агент, різні кейси |
-| Events API | Live транскрипт | Real-time без WebSocket |
+| Events API + React SDK | Live транскрипт | Real-time на клієнті |
 | System Tools (end_call) | Завершення розмови | Нативна інтеграція |
 
 ### Firecrawl (5 advanced features):
