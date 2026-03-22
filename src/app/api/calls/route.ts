@@ -44,7 +44,11 @@ export async function POST(req: NextRequest) {
       if (file.size > MAX_SIZE) {
         return NextResponse.json({ error: "File too large (max 10MB)" }, { status: 400 });
       }
-      fileUrl = await uploadReceipt(file);
+      try {
+        fileUrl = await uploadReceipt(file);
+      } catch (e) {
+        console.warn("File upload failed (BLOB_READ_WRITE_TOKEN may not be set), skipping:", e);
+      }
     }
 
     const call = await prisma.call.create({
@@ -61,6 +65,7 @@ export async function POST(req: NextRequest) {
           { id: "reddit", label: "Searching for refund strategies...", status: "pending", snippet: null },
           { id: "legal", label: "Finding legal requirements...", status: "pending", snippet: null },
           { id: "building", label: "Building your case...", status: "pending", snippet: null },
+          { id: "review", label: "Reviewing your case...", status: "pending", snippet: null },
           { id: "dialing", label: "Dialing...", status: "pending", snippet: null },
         ],
       },

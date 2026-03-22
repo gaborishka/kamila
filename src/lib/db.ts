@@ -25,6 +25,8 @@ export function serializeCall(call: PrismaCall): Call {
     arguments: (call.arguments as unknown as Call["arguments"]) ?? undefined,
     prepSteps: (call.prepSteps as unknown as Call["prepSteps"]) ?? undefined,
     strategy: call.strategy ?? undefined,
+    missingInfo: (call.missingInfo as Call["missingInfo"]) ?? undefined,
+    additionalInfo: (call.additionalInfo as Record<string, string>) ?? undefined,
     agentId: call.agentId ?? undefined,
     conversationId: call.conversationId ?? undefined,
     result: call.resultType

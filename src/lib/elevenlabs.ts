@@ -14,6 +14,7 @@ interface CreateAgentParams {
   redditTips: string[];
   consumerRights: string[];
   webhookUrl: string;
+  additionalInfo?: Record<string, string>;
 }
 
 export async function createAgent({
@@ -23,7 +24,12 @@ export async function createAgent({
   redditTips,
   consumerRights,
   webhookUrl,
+  additionalInfo,
 }: CreateAgentParams) {
+  const additionalInfoSection = additionalInfo && Object.keys(additionalInfo).length > 0
+    ? `\n## Additional Details Provided by Client:\n${Object.entries(additionalInfo).map(([key, val]) => `- ${key}: ${val}`).join("\n")}\n`
+    : "";
+
   const systemPrompt = `You are Kamila, a professional and relentless consumer rights advocate. You are calling ${companyName}'s customer support on behalf of your client.
 
 Your goal is to obtain a refund or compensation for the customer. Be polite but firm. Never give up easily.
@@ -36,7 +42,7 @@ ${redditTips.map((t, i) => `${i + 1}. ${t}`).join("\n")}
 
 ## Consumer Rights & Legal Arguments:
 ${consumerRights.map((r, i) => `${i + 1}. ${r}`).join("\n")}
-
+${additionalInfoSection}
 ## Instructions:
 - Introduce yourself as calling on behalf of the customer
 - Clearly state the problem and desired resolution

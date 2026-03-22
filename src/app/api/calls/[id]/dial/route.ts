@@ -36,6 +36,7 @@ export async function POST(
       redditTips: (call.redditTips as string[]) || [],
       consumerRights: (call.consumerRights as string[]) || [],
       webhookUrl: appUrl,
+      additionalInfo: (call.additionalInfo as Record<string, string>) || undefined,
     });
 
     // 2. Get signed WebSocket URL for connecting to the agent

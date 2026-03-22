@@ -16,6 +16,7 @@
     "db:setup": "docker compose up -d && sleep 2 && prisma db push"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@mendable/firecrawl-js": "^4.16.0",
     "@prisma/client": "^6.9.0",
     "@vercel/blob": "^0.27.1",

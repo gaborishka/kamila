@@ -25,6 +25,8 @@ model Call {
   arguments          Json?     // Argument[]
   prepSteps          Json?     // PrepStep[]
   strategy           String?
+  missingInfo        Json?     // { sufficient: boolean, questions: MissingInfoQuestion[] }
+  additionalInfo     Json?     // Record<string, string> — user answers to missing info questions
 
   agentId            String?
   conversationId     String?

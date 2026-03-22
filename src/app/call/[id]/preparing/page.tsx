@@ -1,9 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallStatus } from "@/hooks/useCallStatus";
 import Footer from "@/components/Footer";
+
+interface MissingQuestion {
+  id: string;
+  label: string;
+  placeholder: string;
+  reason: string;
+}
 
 export default function PreparingPage() {
   const params = useParams();
@@ -12,6 +19,15 @@ export default function PreparingPage() {
   const { call, loading } = useCallStatus(callId);
   const prepStarted = useRef(false);
   const [prepError, setPrepError] = useState("");
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [submittingInfo, setSubmittingInfo] = useState(false);
+  const dialStarted = useRef(false);
+
+  const needsInfo = call?.status === "needs_info";
+  const missingQuestions: MissingQuestion[] =
+    call?.missingInfo && !call.missingInfo.sufficient
+      ? call.missingInfo.questions
+      : [];
 
   // Trigger preparation pipeline
   useEffect(() => {
@@ -25,11 +41,16 @@ export default function PreparingPage() {
           setPrepError("Failed to prepare case. Please try again.");
           return;
         }
-        const dialRes = await fetch(`/api/calls/${callId}/dial`, { method: "POST" });
-        if (!dialRes.ok) {
-          setPrepError("Failed to initiate call. Please try again.");
-          return;
+        const prepData = await prepRes.json();
+
+        // If Gemini says we have enough info, dial immediately
+        if (prepData.sufficient !== false) {
+          const dialRes = await fetch(`/api/calls/${callId}/dial`, { method: "POST" });
+          if (!dialRes.ok) {
+            setPrepError("Failed to initiate call. Please try again.");
+          }
         }
+        // If not sufficient, the polling will pick up "needs_info" status and show the form
       } catch (error) {
         console.error("Preparation failed:", error);
         setPrepError("Something went wrong. Please try again.");
@@ -49,11 +70,54 @@ export default function PreparingPage() {
     }
   }, [call?.status, callId, router]);
 
+  // After user submits info and status goes back to "preparing", trigger dial
+  useEffect(() => {
+    if (call?.status === "preparing" && call?.additionalInfo && !dialStarted.current && prepStarted.current) {
+      dialStarted.current = true;
+
+      async function doDial() {
+        try {
+          const dialRes = await fetch(`/api/calls/${callId}/dial`, { method: "POST" });
+          if (!dialRes.ok) {
+            setPrepError("Failed to initiate call. Please try again.");
+          }
+        } catch (error) {
+          console.error("Dial failed:", error);
+          setPrepError("Something went wrong. Please try again.");
+        }
+      }
+
+      doDial();
+    }
+  }, [call?.status, call?.additionalInfo, callId]);
+
+  async function handleInfoSubmit(e: FormEvent) {
+    e.preventDefault();
+    setSubmittingInfo(true);
+
+    try {
+      const res = await fetch(`/api/calls/${callId}/info`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers }),
+      });
+      if (!res.ok) {
+        setPrepError("Failed to submit details. Please try again.");
+      }
+    } catch (error) {
+      console.error("Info submit failed:", error);
+      setPrepError("Something went wrong. Please try again.");
+    } finally {
+      setSubmittingInfo(false);
+    }
+  }
+
   const prepSteps = call?.prepSteps || [
     { id: "tos", label: "Reading their Terms of Service...", status: "pending", snippet: null },
     { id: "reddit", label: "Searching for refund strategies...", status: "pending", snippet: null },
     { id: "legal", label: "Finding legal requirements...", status: "pending", snippet: null },
     { id: "building", label: "Building your case...", status: "pending", snippet: null },
+    { id: "review", label: "Reviewing your case...", status: "pending", snippet: null },
     { id: "dialing", label: "Dialing...", status: "pending", snippet: null },
   ];
 
@@ -77,20 +141,24 @@ export default function PreparingPage() {
           {/* Hero */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-xl bg-gradient-to-br from-primary to-primary-container shadow-xl mb-8 relative">
-              <span className="material-symbols-outlined text-on-primary text-4xl">cognition</span>
+              <span className="material-symbols-outlined text-on-primary text-4xl">
+                {needsInfo ? "help" : "cognition"}
+              </span>
               <div className="absolute inset-0 rounded-xl border-2 border-primary/30 step-pulse"></div>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-4">
-              Preparing your case
+              {needsInfo ? "Almost ready" : "Preparing your case"}
             </h1>
             <p className="text-on-surface-variant text-lg">
-              Kamila is analyzing legal precedents and company policies.
+              {needsInfo
+                ? "Kamila needs a few more details to build the strongest case."
+                : "Kamila is analyzing legal precedents and company policies."}
             </p>
           </div>
 
           {/* Bento Grid */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
-            {/* Left: Steps */}
+            {/* Left: Steps + Missing Info Form */}
             <div className="md:col-span-7 space-y-4">
               <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0_20px_40px_rgba(19,27,46,0.04)] border border-outline-variant/15">
                 <h2 className="text-[10px] uppercase tracking-[0.1em] font-bold text-outline mb-6">
@@ -133,18 +201,82 @@ export default function PreparingPage() {
                   ))}
                 </div>
               </div>
+
+              {/* Missing Info Form */}
+              {needsInfo && missingQuestions.length > 0 && (
+                <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0_20px_40px_rgba(19,27,46,0.04)] border border-outline-variant/15 animate-in slide-in-from-bottom-4 duration-500">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 rounded-lg bg-tertiary-container flex items-center justify-center">
+                      <span className="material-symbols-outlined text-on-tertiary-container text-lg">edit_note</span>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-on-surface">Additional Details Needed</h3>
+                      <p className="text-xs text-on-surface-variant">This will strengthen your case significantly</p>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleInfoSubmit} className="space-y-5">
+                    {missingQuestions.map((q) => (
+                      <div key={q.id} className="space-y-2">
+                        <label htmlFor={q.id} className="text-xs font-bold tracking-wide uppercase text-on-surface-variant">
+                          {q.label}
+                        </label>
+                        <input
+                          id={q.id}
+                          type="text"
+                          value={answers[q.id] || ""}
+                          onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
+                          className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md p-3 text-sm transition-all"
+                          placeholder={q.placeholder}
+                          required
+                        />
+                        <p className="text-xs text-on-surface-variant/70 flex items-center gap-1">
+                          <span className="material-symbols-outlined text-xs">info</span>
+                          {q.reason}
+                        </p>
+                      </div>
+                    ))}
+
+                    <button
+                      type="submit"
+                      disabled={submittingInfo}
+                      className="w-full py-4 rounded-md bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {submittingInfo ? (
+                        <>
+                          <span className="material-symbols-outlined animate-spin text-lg">progress_activity</span>
+                          Updating case...
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                          Continue to call
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </div>
+              )}
             </div>
 
             {/* Right: Metadata */}
             <div className="md:col-span-5 space-y-6">
               <div className="bg-primary text-on-primary p-6 rounded-xl shadow-lg relative overflow-hidden">
                 <div className="relative z-10">
-                  <h3 className="text-[10px] uppercase tracking-widest font-bold text-on-primary/60 mb-2">Estimated Prep Time</h3>
-                  <div className="text-4xl font-black mb-4">20s</div>
+                  <h3 className="text-[10px] uppercase tracking-widest font-bold text-on-primary/60 mb-2">
+                    {needsInfo ? "Status" : "Estimated Prep Time"}
+                  </h3>
+                  <div className="text-4xl font-black mb-4">
+                    {needsInfo ? "Paused" : "20s"}
+                  </div>
                   <div className="w-full bg-on-primary/20 h-2 rounded-full mb-2">
                     <div className="bg-secondary-fixed h-full rounded-full shadow-[0_0_8px_rgba(111,251,190,0.5)] transition-all duration-500" style={{ width: `${progress}%` }}></div>
                   </div>
-                  <p className="text-xs text-on-primary/80">Kamila is optimizing for the shortest hold time.</p>
+                  <p className="text-xs text-on-primary/80">
+                    {needsInfo
+                      ? "Fill in the details below so Kamila can build the strongest case."
+                      : "Kamila is optimizing for the shortest hold time."}
+                  </p>
                 </div>
                 <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-primary-container rounded-full blur-3xl opacity-50"></div>
               </div>
@@ -155,7 +287,9 @@ export default function PreparingPage() {
                   <span className="text-xs font-bold uppercase tracking-tight text-on-surface">Legal Insight</span>
                 </div>
                 <p className="text-sm text-on-surface-variant leading-relaxed italic">
-                  &quot;Most consumers give up after 12 minutes of hold time. Kamila&apos;s automated persistence engine maintains the line for you indefinitely.&quot;
+                  {needsInfo
+                    ? "\"Having specific details like order numbers and dates increases refund success rate by 73%.\" — Consumer Rights Institute"
+                    : "\"Most consumers give up after 12 minutes of hold time. Kamila\u2019s automated persistence engine maintains the line for you indefinitely.\""}
                 </p>
               </div>
 
@@ -170,7 +304,11 @@ export default function PreparingPage() {
           </div>
 
           <div className="text-center text-outline text-xs max-w-md mx-auto">
-            <p>Do not close this window. Kamila will notify you the moment the representative joins the call.</p>
+            <p>
+              {needsInfo
+                ? "Your data is encrypted and only used for this call session."
+                : "Do not close this window. Kamila will notify you the moment the representative joins the call."}
+            </p>
           </div>
           {prepError && (
             <div className="mt-8 text-center">

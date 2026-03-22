@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { extractTosData, searchRedditTips, searchConsumerRights } from "@/lib/firecrawl";
+import { analyzeCase } from "@/lib/gemini";
 import type { Prisma } from "@prisma/client";
 
 interface PrepStep {
@@ -33,6 +34,10 @@ export async function POST(
 
     if (!call) {
       return NextResponse.json({ error: "Call not found" }, { status: 404 });
+    }
+
+    if (call.status !== "preparing") {
+      return NextResponse.json({ error: "Call is not in preparing state" }, { status: 400 });
     }
 
     const companyName = call.companyName;
@@ -146,11 +151,48 @@ export async function POST(
       data: {
         arguments: args,
         strategy: `Will present the case citing ${companyName}'s own Terms of Service. If denied, will escalate with consumer protection laws and proven negotiation strategies.`,
-        prepSteps: updateSteps(steps, done, "dialing"),
+        prepSteps: updateSteps(steps, done, "review"),
       },
     });
 
-    return NextResponse.json({ success: true });
+    // Step 5: Gemini reviews if we have enough info
+    let analysis = { sufficient: true, questions: [] as { id: string; label: string; placeholder: string; reason: string }[] };
+    try {
+      analysis = await analyzeCase({
+        companyName,
+        problemDescription: call.problemDescription,
+        customerName: call.customerName,
+        orderNumber: call.orderNumber,
+        tosData: tosData as Record<string, unknown> | null,
+        redditTips,
+        consumerRights,
+      });
+    } catch (e) {
+      console.error("Gemini analysis failed, proceeding anyway:", e);
+    }
+
+    if (analysis.sufficient) {
+      done.review = "All information verified — ready to call.";
+      await prisma.call.update({
+        where: { id },
+        data: {
+          missingInfo: { sufficient: true, questions: [] },
+          prepSteps: updateSteps(steps, done, "dialing"),
+        },
+      });
+    } else {
+      done.review = `Need ${analysis.questions.length} more detail${analysis.questions.length > 1 ? "s" : ""} before calling.`;
+      await prisma.call.update({
+        where: { id },
+        data: {
+          status: "needs_info",
+          missingInfo: { sufficient: false, questions: analysis.questions },
+          prepSteps: updateSteps(steps, done),
+        },
+      });
+    }
+
+    return NextResponse.json({ success: true, sufficient: analysis.sufficient });
   } catch (error) {
     console.error("Preparation failed:", error);
     return NextResponse.json(

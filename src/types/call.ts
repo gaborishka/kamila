@@ -1,4 +1,4 @@
-export type CallStatus = "preparing" | "live" | "completed";
+export type CallStatus = "preparing" | "needs_info" | "live" | "completed";
 export type CallResult = "success" | "partial" | "failed";
 export type PrepStepStatus = "pending" | "active" | "complete";
 
@@ -60,6 +60,18 @@ export interface Call {
 
   // Strategy
   strategy?: string;
+
+  // Pre-call validation
+  missingInfo?: {
+    sufficient: boolean;
+    questions: {
+      id: string;
+      label: string;
+      placeholder: string;
+      reason: string;
+    }[];
+  };
+  additionalInfo?: Record<string, string>;
 
   // Result
   result?: {
