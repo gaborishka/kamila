@@ -94,6 +94,7 @@ export default function PreparingPage() {
   async function handleInfoSubmit(e: FormEvent) {
     e.preventDefault();
     setSubmittingInfo(true);
+    setPrepError("");
 
     try {
       const res = await fetch(`/api/calls/${callId}/info`, {

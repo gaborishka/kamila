@@ -25,6 +25,10 @@ export async function POST(
       return NextResponse.json({ error: "Call not found" }, { status: 404 });
     }
 
+    if (call.status === "live" || call.status === "completed") {
+      return NextResponse.json({ error: "Call already in progress" }, { status: 400 });
+    }
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const prepSteps = (call.prepSteps as { id: string; label: string; status: string; snippet: string | null }[]) || [];
 

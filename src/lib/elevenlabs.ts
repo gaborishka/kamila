@@ -27,7 +27,7 @@ export async function createAgent({
   additionalInfo,
 }: CreateAgentParams) {
   const additionalInfoSection = additionalInfo && Object.keys(additionalInfo).length > 0
-    ? `\n## Additional Details Provided by Client:\n${Object.entries(additionalInfo).map(([key, val]) => `- ${key}: ${val}`).join("\n")}\n`
+    ? `\n## Additional Details Provided by Client:\n${Object.entries(additionalInfo).map(([key, val]) => `- ${key.replace(/[#\n\r]/g, "")}: ${val.replace(/[#\n\r]/g, " ").slice(0, 500)}`).join("\n")}\n`
     : "";
 
   const systemPrompt = `You are Kamila, a professional and relentless consumer rights advocate. You are calling ${companyName}'s customer support on behalf of your client.
