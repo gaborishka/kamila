@@ -12,6 +12,7 @@ export async function GET(
       where: { callId: id },
       orderBy: { timestamp: "asc" },
     });
+
     return NextResponse.json(messages.map(serializeTranscript));
   } catch (error) {
     console.error("Error fetching transcript:", error);

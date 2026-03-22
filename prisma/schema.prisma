@@ -44,6 +44,7 @@ model Call {
   callEndedAt        DateTime?
 
   transcript         TranscriptMessage[]
+  clientQuestions    ClientQuestion[]
 }
 
 model TranscriptMessage {
@@ -54,6 +55,18 @@ model TranscriptMessage {
   text      String
   timestamp Float
   citedTos  Boolean @default(false)
+
+  @@index([callId])
+}
+
+model ClientQuestion {
+  id         String    @id @default(cuid())
+  callId     String
+  call       Call      @relation(fields: [callId], references: [id], onDelete: Cascade)
+  question   String
+  answer     String?
+  createdAt  DateTime  @default(now())
+  answeredAt DateTime?
 
   @@index([callId])
 }

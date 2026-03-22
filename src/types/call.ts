@@ -25,6 +25,15 @@ export interface Argument {
   used: boolean;
 }
 
+export interface ClientQuestion {
+  id: string;
+  callId: string;
+  question: string;
+  answer?: string;
+  createdAt: number;
+  answeredAt?: number;
+}
+
 export interface Call {
   id: string;
   status: CallStatus;

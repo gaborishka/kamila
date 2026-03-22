@@ -38,7 +38,7 @@ export function useTranscript(callId: string, callStatus?: string) {
     const interval = setInterval(() => {
       if (statusRef.current === "completed") return;
       fetchTranscript();
-    }, 2000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [callId, fetchTranscript, callStatus]);

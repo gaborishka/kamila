@@ -9,6 +9,7 @@ function getHeaders() {
 
 interface CreateAgentParams {
   companyName: string;
+  callId: string;
   tosData: Record<string, unknown>;
   redditTips: string[];
   consumerRights: string[];
@@ -17,6 +18,7 @@ interface CreateAgentParams {
 
 export async function createAgent({
   companyName,
+  callId,
   tosData,
   redditTips,
   consumerRights,
@@ -43,7 +45,8 @@ ${consumerRights.map((r, i) => `${i + 1}. ${r}`).join("\n")}
 - Stay calm, professional, and persistent
 - If offered a partial resolution, negotiate for better terms
 - Collect the operator's name and any reference numbers
-- Use {{customer_name}}, {{order_number}}, and {{problem_description}} as provided`;
+- Use {{customer_name}}, {{order_number}}, and {{problem_description}} as provided
+- If you need information that wasn't provided (like order number, date, exact amount, account details), use the ask_client tool to ask the customer. They are listening to the call live and can provide information in real-time. While waiting for their response, tell the operator something like "Let me check that with my client" to keep the conversation natural.`;
 
   const res = await fetch(`${ELEVENLABS_API_BASE}/convai/agents/create`, {
     method: "POST",
@@ -75,10 +78,32 @@ ${consumerRights.map((r, i) => `${i + 1}. ${r}`).join("\n")}
                 },
               },
             },
+            {
+              type: "webhook",
+              name: "ask_client",
+              description: "Ask your client (the person who initiated this call) for information you need but don't have. Use this when the operator asks for details like order number, account number, date of purchase, exact amount, or any other information not in your briefing. The client is listening live and will respond.",
+              api_schema: {
+                url: `${webhookUrl}/api/tools/ask-client?callId=${callId}`,
+                method: "POST",
+                request_body: {
+                  type: "object",
+                  properties: {
+                    question: {
+                      type: "string",
+                      description: "The question to ask the client, e.g. 'What is your order number?' or 'When did you make the purchase?'",
+                    },
+                  },
+                  required: ["question"],
+                },
+              },
+            },
           ],
         },
         tts: {
-          voice_id: "21m00Tcm4TlvDq8ikWAM",
+          model_id: "eleven_v3_conversational",
+          voice_id: "EXAVITQu4vr4xnSDxMaL", // Sarah - Mature, Reassuring, Confident
+          expressivity: 1.0,
+          agent_output_audio_format: "ulaw_8000", // Twilio native format — no conversion needed
         },
       },
       platform_settings: {
@@ -120,42 +145,18 @@ ${consumerRights.map((r, i) => `${i + 1}. ${r}`).join("\n")}
   return res.json();
 }
 
-interface OutboundCallParams {
-  agentId: string;
-  toNumber: string;
-  customerName: string;
-  orderNumber: string;
-  problemDescription: string;
-}
-
-export async function initiateOutboundCall({
-  agentId,
-  toNumber,
-  customerName,
-  orderNumber,
-  problemDescription,
-}: OutboundCallParams) {
-  const res = await fetch(`${ELEVENLABS_API_BASE}/convai/twilio/outbound-call`, {
-    method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify({
-      agent_id: agentId,
-      agent_phone_number_id: process.env.TWILIO_PHONE_NUMBER,
-      to_number: toNumber,
-      conversation_initiation_client_data: {
-        dynamic_variables: {
-          customer_name: customerName,
-          order_number: orderNumber,
-          problem_description: problemDescription,
-        },
-      },
-    }),
-  });
+/** Get a signed WebSocket URL for connecting to an ElevenLabs agent */
+export async function getSignedUrl(agentId: string): Promise<string> {
+  const res = await fetch(
+    `${ELEVENLABS_API_BASE}/convai/conversation/get_signed_url?agent_id=${agentId}`,
+    { headers: { "xi-api-key": process.env.ELEVENLABS_API_KEY || "" } }
+  );
 
   if (!res.ok) {
     const error = await res.text();
-    throw new Error(`Failed to initiate call: ${error}`);
+    throw new Error(`Failed to get signed URL: ${error}`);
   }
 
-  return res.json();
+  const data = await res.json();
+  return data.signed_url;
 }

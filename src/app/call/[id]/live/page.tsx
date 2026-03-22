@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallStatus } from "@/hooks/useCallStatus";
 import { useTranscript } from "@/hooks/useTranscript";
+import { useClientQuestions } from "@/hooks/useClientQuestions";
+import { useAudioStream } from "@/hooks/useAudioStream";
 import Footer from "@/components/Footer";
 
 export default function LiveCallPage() {
@@ -12,9 +14,12 @@ export default function LiveCallPage() {
   const callId = params.id as string;
   const { call } = useCallStatus(callId);
   const { messages } = useTranscript(callId, call?.status);
+  const { questions, answerQuestion } = useClientQuestions(callId, call?.status);
+  const { isPlaying, volume, setVolume } = useAudioStream(callId, call?.status);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const [callDuration, setCallDuration] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [answerInputs, setAnswerInputs] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setMounted(true);
@@ -96,13 +101,18 @@ export default function LiveCallPage() {
       <main className="flex-grow max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8 px-6 py-8 h-[calc(100vh-80px)] overflow-hidden">
         {/* Left: Transcript */}
         <div className="md:col-span-8 flex flex-col gap-6 h-full overflow-hidden">
-          {/* Audio visualizer */}
+          {/* Audio player */}
           <div className="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant/10 flex items-center gap-6">
-            <button aria-label="Toggle microphone" className="p-2 hover:bg-surface-container rounded-full transition-colors text-primary">
-              <span className="material-symbols-outlined">mic</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <span className={`material-symbols-outlined ${isPlaying ? "text-secondary" : "text-outline"}`}>
+                {isPlaying ? "hearing" : "hearing_disabled"}
+              </span>
+              <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                {isPlaying ? "Live Audio" : "Connecting..."}
+              </span>
+            </div>
             <div className="flex-grow flex items-center gap-1 h-8">
-              {mounted && [3, 5, 8, 4, 6, 3, 5, 2, 6, 8, 5, 3, 4, 6, 8, 4, 5, 3].map((h, i) => (
+              {mounted && isPlaying && [3, 5, 8, 4, 6, 3, 5, 2, 6, 8, 5, 3, 4, 6, 8, 4, 5, 3].map((h, i) => (
                 <div
                   key={i}
                   className="w-1 bg-primary rounded-full animate-pulse"
@@ -115,12 +125,76 @@ export default function LiveCallPage() {
               ))}
             </div>
             <div className="flex items-center gap-2 pr-2">
-              <span className="material-symbols-outlined text-outline">volume_up</span>
-              <div className="w-24 h-1 bg-surface-container rounded-full overflow-hidden">
-                <div className="w-2/3 h-full bg-primary"></div>
-              </div>
+              <span className="material-symbols-outlined text-outline text-sm">
+                {volume === 0 ? "volume_off" : volume < 0.5 ? "volume_down" : "volume_up"}
+              </span>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={volume}
+                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                className="w-24 h-1 accent-primary cursor-pointer"
+              />
             </div>
           </div>
+
+          {/* Kamila needs info from you */}
+          {questions.length > 0 && (
+            <div className="flex flex-col gap-3 animate-in slide-in-from-top">
+              {questions.map((q) => (
+                <div
+                  key={q.id}
+                  className="bg-tertiary-container/30 border-2 border-tertiary rounded-xl p-4 flex flex-col gap-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-tertiary"></span>
+                    </span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-tertiary">
+                      Kamila needs your help
+                    </span>
+                  </div>
+                  <p className="text-sm font-medium text-on-surface">{q.question}</p>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const answer = answerInputs[q.id]?.trim();
+                      if (answer) {
+                        answerQuestion(q.id, answer);
+                        setAnswerInputs((prev) => {
+                          const next = { ...prev };
+                          delete next[q.id];
+                          return next;
+                        });
+                      }
+                    }}
+                    className="flex gap-2"
+                  >
+                    <input
+                      type="text"
+                      value={answerInputs[q.id] || ""}
+                      onChange={(e) =>
+                        setAnswerInputs((prev) => ({ ...prev, [q.id]: e.target.value }))
+                      }
+                      placeholder="Type your answer..."
+                      className="flex-grow px-3 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant/30 text-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-tertiary"
+                      autoFocus
+                    />
+                    <button
+                      type="submit"
+                      className="bg-tertiary text-on-tertiary px-4 py-2 rounded-lg text-sm font-bold transition-transform active:scale-[0.97] flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-sm">send</span>
+                      Send
+                    </button>
+                  </form>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Transcript */}
           <div ref={transcriptRef} className="flex-grow bg-surface-container-low rounded-xl p-8 overflow-y-auto no-scrollbar flex flex-col gap-8 relative">
