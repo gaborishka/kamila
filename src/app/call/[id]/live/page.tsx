@@ -15,7 +15,7 @@ export default function LiveCallPage() {
   const { call } = useCallStatus(callId);
   const { messages } = useTranscript(callId, call?.status);
   const { questions, answerQuestion } = useClientQuestions(callId, call?.status);
-  const { isPlaying, volume, setVolume } = useAudioStream(callId, call?.status);
+  const { isPlaying, needsGesture, startAudio, volume, setVolume } = useAudioStream(callId, call?.status);
   const transcriptRef = useRef<HTMLDivElement>(null);
   const [callDuration, setCallDuration] = useState(0);
   const [mounted, setMounted] = useState(false);
@@ -103,14 +103,24 @@ export default function LiveCallPage() {
         <div className="md:col-span-8 flex flex-col gap-6 h-full overflow-hidden">
           {/* Audio player */}
           <div className="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant/10 flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className={`material-symbols-outlined ${isPlaying ? "text-secondary" : "text-outline"}`}>
-                {isPlaying ? "hearing" : "hearing_disabled"}
-              </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                {isPlaying ? "Live Audio" : "Connecting..."}
-              </span>
-            </div>
+            {needsGesture ? (
+              <button
+                onClick={startAudio}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-md font-bold text-xs uppercase tracking-wider hover:opacity-90 active:scale-[0.98] transition-all"
+              >
+                <span className="material-symbols-outlined text-sm">volume_up</span>
+                Enable Audio
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className={`material-symbols-outlined ${isPlaying ? "text-secondary" : "text-outline"}`}>
+                  {isPlaying ? "hearing" : "hearing_disabled"}
+                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                  {isPlaying ? "Live Audio" : "Connecting..."}
+                </span>
+              </div>
+            )}
             <div className="flex-grow flex items-center gap-1 h-8">
               {mounted && isPlaying && [3, 5, 8, 4, 6, 3, 5, 2, 6, 8, 5, 3, 4, 6, 8, 4, 5, 3].map((h, i) => (
                 <div

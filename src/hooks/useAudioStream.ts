@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 // µ-law decoding (ITU-T G.711)
 function decodeMulaw(mulawByte: number): number {
@@ -25,11 +25,11 @@ function mulawToFloat32(base64: string): Float32Array {
 
 export function useAudioStream(callId: string, callStatus?: string) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [needsGesture, setNeedsGesture] = useState(false);
   const [volume, setVolume] = useState(0.7);
   const ctxRef = useRef<AudioContext | null>(null);
   const gainRef = useRef<GainNode | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  // Separate timelines for agent and operator so they don't block each other
   const nextTimeAgent = useRef(0);
   const nextTimeOperator = useRef(0);
 
@@ -38,6 +38,17 @@ export function useAudioStream(callId: string, callStatus?: string) {
       gainRef.current.gain.value = volume;
     }
   }, [volume]);
+
+  // Start or resume audio — can be called from user gesture
+  const startAudio = useCallback(() => {
+    const ctx = ctxRef.current;
+    if (ctx && ctx.state === "suspended") {
+      ctx.resume().then(() => {
+        setNeedsGesture(false);
+        setIsPlaying(true);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     if (!callId || callStatus !== "live") return;
@@ -51,11 +62,20 @@ export function useAudioStream(callId: string, callStatus?: string) {
     nextTimeAgent.current = 0;
     nextTimeOperator.current = 0;
 
+    // Check if browser blocked autoplay
+    if (audioCtx.state === "suspended") {
+      setNeedsGesture(true);
+    } else {
+      setIsPlaying(true);
+    }
+
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const ws = new WebSocket(`${protocol}//${window.location.host}/audio-listen?callId=${callId}`);
     wsRef.current = ws;
 
-    ws.onopen = () => setIsPlaying(true);
+    ws.onopen = () => {
+      if (audioCtx.state === "running") setIsPlaying(true);
+    };
 
     ws.onmessage = (event) => {
       if (!ctxRef.current || ctxRef.current.state === "closed") return;
@@ -77,7 +97,6 @@ export function useAudioStream(callId: string, callStatus?: string) {
       source.buffer = buffer;
       source.connect(gainRef.current!);
 
-      // Each source has its own timeline — they play simultaneously, not sequentially
       const now = ctxRef.current.currentTime;
       const timeRef = data.source === "agent" ? nextTimeAgent : nextTimeOperator;
       if (timeRef.current < now) {
@@ -94,8 +113,9 @@ export function useAudioStream(callId: string, callStatus?: string) {
       ws.close();
       audioCtx.close();
       setIsPlaying(false);
+      setNeedsGesture(false);
     };
   }, [callId, callStatus]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return { isPlaying, volume, setVolume };
+  return { isPlaying, needsGesture, startAudio, volume, setVolume };
 }
