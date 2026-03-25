@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, serializeCall } from "@/lib/db";
 import { uploadReceipt } from "@/lib/blob";
+import { auth } from "@/lib/auth";
 
 export async function GET() {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json([]);
+    }
     const calls = await prisma.call.findMany({
+      where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(calls.map(serializeCall));
@@ -24,6 +30,7 @@ export async function POST(req: NextRequest) {
     const problemDescription = formData.get("problemDescription") as string;
     const customerName = formData.get("customerName") as string;
     const orderNumber = formData.get("orderNumber") as string | null;
+    const language = (formData.get("language") as string) || "en";
     const file = formData.get("file") as File | null;
 
     if (!companyName || !supportPhone || !problemDescription || !customerName) {
@@ -51,6 +58,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const session = await auth();
+
     const call = await prisma.call.create({
       data: {
         companyName,
@@ -59,7 +68,9 @@ export async function POST(req: NextRequest) {
         problemDescription,
         customerName,
         orderNumber: orderNumber || null,
+        language,
         fileUrl: fileUrl || null,
+        userId: session?.user?.id ?? null,
         prepSteps: [
           { id: "tos", label: "Reading their Terms of Service...", status: "pending", snippet: null },
           { id: "reddit", label: "Searching for refund strategies...", status: "pending", snippet: null },

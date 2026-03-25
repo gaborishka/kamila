@@ -5,12 +5,16 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FileUpload from "@/components/FileUpload";
+import { COUNTRIES, LANGUAGES } from "@/lib/language";
 
 export default function NewCallPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [companyName, setCompanyName] = useState("");
-  const [supportPhone, setSupportPhone] = useState("");
+  const defaultCountryIndex = COUNTRIES.findIndex(c => c.code === "+1" && c.country === "United States");
+  const [countryIndex, setCountryIndex] = useState(defaultCountryIndex);
+  const [language, setLanguage] = useState(COUNTRIES[defaultCountryIndex].lang);
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [companyUrl, setCompanyUrl] = useState("");
   const [problemDescription, setProblemDescription] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -24,6 +28,7 @@ export default function NewCallPage() {
     setError("");
 
     try {
+      const supportPhone = `${COUNTRIES[countryIndex].code}${phoneNumber}`;
       const formData = new FormData();
       formData.append("companyName", companyName);
       formData.append("supportPhone", supportPhone);
@@ -31,6 +36,7 @@ export default function NewCallPage() {
       formData.append("problemDescription", problemDescription);
       formData.append("customerName", customerName);
       if (orderNumber) formData.append("orderNumber", orderNumber);
+      formData.append("language", language);
       if (file) formData.append("file", file);
 
       const res = await fetch("/api/calls", {
@@ -58,7 +64,7 @@ export default function NewCallPage() {
   return (
     <>
       <Header />
-      <main className="max-w-7xl mx-auto px-6 py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <main className="max-w-7xl mx-auto px-6 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
         <section className="lg:col-span-5 flex flex-col justify-center">
           <div className="mb-8">
             <span className="text-xs font-bold tracking-[0.2em] text-primary uppercase mb-4 block">
@@ -92,16 +98,16 @@ export default function NewCallPage() {
         </section>
 
         <section className="lg:col-span-7">
-          <div className="bg-surface-container-lowest p-8 md:p-12 rounded-xl shadow-[0_20px_40px_rgba(19,27,46,0.06)] border border-outline-variant/15">
-            <form onSubmit={handleSubmit} className="space-y-12">
+          <div className="bg-surface-container-lowest p-6 md:p-8 rounded-xl shadow-[0_20px_40px_rgba(19,27,46,0.06)] border border-outline-variant/15">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Section 01: Company */}
               <div>
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-4">
                   <span className="text-xs font-bold px-2 py-1 bg-primary/10 text-primary rounded-sm">01</span>
                   <h2 className="text-xl font-bold tracking-tight">The Company</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
+                <div className="space-y-4">
+                  <div className="space-y-1">
                     <label htmlFor="companyName" className="text-xs font-bold tracking-wide uppercase text-on-surface-variant">
                       Company name or website URL
                     </label>
@@ -113,27 +119,44 @@ export default function NewCallPage() {
                         setCompanyName(e.target.value);
                         if (e.target.value.startsWith("http")) setCompanyUrl(e.target.value);
                       }}
-                      className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md p-4 transition-all"
+                      className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md px-4 py-3 transition-all"
                       placeholder="e.g. Delta Airlines"
                       required
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <label htmlFor="supportPhone" className="text-xs font-bold tracking-wide uppercase text-on-surface-variant">
                       Support phone number
                     </label>
-                    <input
-                      id="supportPhone"
-                      type="tel"
-                      value={supportPhone}
-                      onChange={(e) => setSupportPhone(e.target.value)}
-                      className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md p-4 transition-all"
-                      placeholder="+1 (800) 000-0000"
-                      required
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        value={countryIndex}
+                        onChange={(e) => {
+                          const idx = Number(e.target.value);
+                          setCountryIndex(idx);
+                          setLanguage(COUNTRIES[idx].lang);
+                        }}
+                        className="bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md px-4 py-3 transition-all text-sm shrink-0 appearance-none"
+                      >
+                        {COUNTRIES.map((c, i) => (
+                          <option key={`${c.code}-${c.country}`} value={i}>
+                            {c.flag} {c.country} ({c.code})
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        id="supportPhone"
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        className="flex-1 min-w-0 bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md px-4 py-3 transition-all"
+                        placeholder="(800) 000-0000"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
-                <p className="mt-3 text-sm text-slate-500 italic flex items-center gap-2">
+                <p className="mt-2 text-sm text-slate-500 italic flex items-center gap-2">
                   <span className="material-symbols-outlined text-base">info</span>
                   If you don&apos;t know the number, paste their website and we&apos;ll find it
                 </p>
@@ -141,11 +164,11 @@ export default function NewCallPage() {
 
               {/* Section 02: Problem */}
               <div>
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-4">
                   <span className="text-xs font-bold px-2 py-1 bg-primary/10 text-primary rounded-sm">02</span>
                   <h2 className="text-xl font-bold tracking-tight">Your Problem</h2>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <FileUpload onFileSelect={setFile} file={file} />
                   <div className="space-y-2">
                     <label htmlFor="problemDescription" className="text-xs font-bold tracking-wide uppercase text-on-surface-variant">
@@ -155,9 +178,9 @@ export default function NewCallPage() {
                       id="problemDescription"
                       value={problemDescription}
                       onChange={(e) => setProblemDescription(e.target.value)}
-                      className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md p-4 transition-all resize-none"
+                      className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md px-4 py-3 transition-all resize-none"
                       placeholder="My flight was delayed 4 hours..."
-                      rows={4}
+                      rows={3}
                       required
                     />
                   </div>
@@ -166,11 +189,11 @@ export default function NewCallPage() {
 
               {/* Section 03: Your Data */}
               <div>
-                <div className="flex items-center gap-2 mb-6">
+                <div className="flex items-center gap-2 mb-4">
                   <span className="text-xs font-bold px-2 py-1 bg-primary/10 text-primary rounded-sm">03</span>
                   <h2 className="text-xl font-bold tracking-tight">Your Data</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
                   <div className="space-y-2">
                     <label htmlFor="customerName" className="text-xs font-bold tracking-wide uppercase text-on-surface-variant">
                       Your name
@@ -180,7 +203,7 @@ export default function NewCallPage() {
                       type="text"
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
-                      className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md p-4 transition-all"
+                      className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md px-4 py-3 transition-all"
                       placeholder="Full Name"
                       required
                     />
@@ -195,19 +218,40 @@ export default function NewCallPage() {
                       type="text"
                       value={orderNumber}
                       onChange={(e) => setOrderNumber(e.target.value)}
-                      className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md p-4 transition-all"
+                      className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md px-4 py-3 transition-all"
                       placeholder="ABC-12345"
                     />
                   </div>
                 </div>
+                <div className="mt-4 space-y-1">
+                  <label htmlFor="language" className="text-xs font-bold tracking-wide uppercase text-on-surface-variant">
+                    Call language
+                  </label>
+                  <select
+                    id="language"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    className="w-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary rounded-md px-4 py-3 transition-all text-sm"
+                  >
+                    {LANGUAGES.map((l) => (
+                      <option key={l.code} value={l.code}>
+                        {l.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-on-surface-variant/70 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs">info</span>
+                    Auto-detected from country. Change if support speaks a different language.
+                  </p>
+                </div>
               </div>
 
               {/* Submit */}
-              <div className="pt-6">
+              <div className="pt-2">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-5 rounded-md bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold text-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.99] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                  className="w-full py-4 rounded-md bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold text-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.99] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                 >
                   {loading ? (
                     <>
@@ -224,7 +268,7 @@ export default function NewCallPage() {
                 {error && (
                   <p className="text-center mt-4 text-sm text-error font-medium">{error}</p>
                 )}
-                <p className="text-center mt-6 text-xs text-on-surface-variant uppercase tracking-widest font-bold">
+                <p className="text-center mt-3 text-xs text-on-surface-variant uppercase tracking-widest font-bold">
                   Relentless Resolution Guarantee
                 </p>
               </div>

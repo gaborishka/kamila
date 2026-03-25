@@ -41,6 +41,7 @@ export async function POST(
       consumerRights: (call.consumerRights as string[]) || [],
       webhookUrl: appUrl,
       additionalInfo: (call.additionalInfo as Record<string, string>) || undefined,
+      language: call.language || "en",
     });
 
     // 2. Get signed WebSocket URL for connecting to the agent

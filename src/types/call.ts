@@ -43,6 +43,7 @@ export interface Call {
   problemDescription: string;
   customerName: string;
   orderNumber?: string;
+  language: string;
   fileUrl?: string;
 
   // Preparation data

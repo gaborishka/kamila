@@ -18,6 +18,7 @@ export function serializeCall(call: PrismaCall): Call {
     problemDescription: call.problemDescription,
     customerName: call.customerName,
     orderNumber: call.orderNumber ?? undefined,
+    language: call.language,
     fileUrl: call.fileUrl ?? undefined,
     tosData: (call.tosData as Record<string, unknown>) ?? undefined,
     redditTips: (call.redditTips as string[]) ?? undefined,
