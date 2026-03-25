@@ -12,6 +12,19 @@ interface MissingQuestion {
   reason: string;
 }
 
+const FIRECRAWL_STEPS = new Set(["tos", "reddit", "legal"]);
+
+function FirecrawlBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 ml-2 px-1.5 py-0.5 rounded bg-orange-50 text-orange-600">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="shrink-0">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H8l5-8v4h3l-5 8z" fill="currentColor"/>
+      </svg>
+      <span className="text-[9px] font-bold tracking-wide uppercase">Firecrawl</span>
+    </span>
+  );
+}
+
 export default function PreparingPage() {
   const params = useParams();
   const router = useRouter();
@@ -180,8 +193,9 @@ export default function PreparingPage() {
                         ) : null}
                       </div>
                       <div>
-                        <p className={`text-sm ${step.status === "active" ? "font-bold text-primary" : "font-semibold text-on-surface"}`}>
+                        <p className={`text-sm flex items-center flex-wrap ${step.status === "active" ? "font-bold text-primary" : "font-semibold text-on-surface"}`}>
                           {step.label}
+                          {FIRECRAWL_STEPS.has(step.id) && step.status !== "pending" && <FirecrawlBadge />}
                         </p>
                         {step.snippet && step.status === "complete" && (
                           <div className="mt-2 p-3 bg-surface-container-low rounded-lg border-l-4 border-secondary">
@@ -283,15 +297,47 @@ export default function PreparingPage() {
               </div>
 
               <div className="bg-surface-container p-6 rounded-xl border border-outline-variant/15">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="material-symbols-outlined text-tertiary">gavel</span>
-                  <span className="text-xs font-bold uppercase tracking-tight text-on-surface">Legal Insight</span>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-tertiary">database</span>
+                    <span className="text-xs font-bold uppercase tracking-tight text-on-surface">Data Intelligence</span>
+                  </div>
                 </div>
-                <p className="text-sm text-on-surface-variant leading-relaxed italic">
-                  {needsInfo
-                    ? "\"Having specific details like order numbers and dates increases refund success rate by 73%.\" — Consumer Rights Institute"
-                    : "\"Most consumers give up after 12 minutes of hold time. Kamila\u2019s automated persistence engine maintains the line for you indefinitely.\""}
-                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-orange-50/80 rounded-lg">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shrink-0 shadow-sm">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H8l5-8v4h3l-5 8z" fill="white"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-orange-900">Firecrawl</p>
+                      <p className="text-[10px] text-orange-700/80">Terms of Service, Reddit, Legal</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-surface-container-low rounded-lg">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shrink-0 shadow-sm">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-on-surface">Gemini AI</p>
+                      <p className="text-[10px] text-on-surface-variant">Case validation & analysis</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-surface-container-low rounded-lg">
+                    <div className="w-8 h-8 rounded-md bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shrink-0 shadow-sm">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" fill="white"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-on-surface">ElevenLabs</p>
+                      <p className="text-[10px] text-on-surface-variant">Voice agent & live call</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
