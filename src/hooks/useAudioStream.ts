@@ -8,8 +8,8 @@ function decodeMulaw(mulawByte: number): number {
   const sign = mulawByte & 0x80;
   const exponent = (mulawByte >> 4) & 0x07;
   const mantissa = mulawByte & 0x0f;
-  let sample = ((mantissa << 1) + 33) << exponent;
-  sample -= 33;
+  let sample = (((mantissa << 1) + 33) << exponent) - 33;
+  sample <<= 2; // scale to full 16-bit range
   return sign ? -sample : sample;
 }
 

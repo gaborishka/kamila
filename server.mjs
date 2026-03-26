@@ -44,7 +44,7 @@ function mulaw8kToPcm16k(b64) {
   // Upsample 8k→16k = duplicate each sample. Output is 16-bit LE.
   const out = Buffer.alloc(mulawBuf.length * 4);
   for (let i = 0; i < mulawBuf.length; i++) {
-    const sample = mulawToLinear(mulawBuf[i]);
+    const sample = Math.max(-32768, Math.min(32767, mulawToLinear(mulawBuf[i]) << 2));
     out.writeInt16LE(sample, i * 4);
     out.writeInt16LE(sample, i * 4 + 2);
   }
