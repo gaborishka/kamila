@@ -200,6 +200,61 @@ mediaWss.on("connection", (twilioWs) => {
               break;
             }
 
+            case "client_tool_call": {
+              const toolName = message.client_tool_call?.tool_name;
+              const toolCallId = message.client_tool_call?.tool_call_id;
+              let toolParams = message.client_tool_call?.parameters || {};
+              if (typeof toolParams === "string") {
+                try { toolParams = JSON.parse(toolParams); } catch { toolParams = {}; }
+              }
+
+              if (toolName === "ask_client" && callId && toolCallId) {
+                const question = toolParams.question || "Can you provide more information?";
+                console.log(`[Bridge] Agent asking client — callId=${callId}, question="${question}"`);
+
+                // Create question in DB so the frontend can show it
+                prisma.clientQuestion.create({
+                  data: { callId, question },
+                }).then(async (q) => {
+                  // Poll for the client's answer (up to 60s, matching response_timeout_secs)
+                  const POLL_MS = 1000;
+                  const TIMEOUT_MS = 55_000; // slightly under 60s to respond before ElevenLabs times out
+                  const start = Date.now();
+
+                  while (Date.now() - start < TIMEOUT_MS) {
+                    await new Promise((r) => setTimeout(r, POLL_MS));
+                    const updated = await prisma.clientQuestion.findUnique({ where: { id: q.id } });
+                    if (updated?.answer) {
+                      elevenLabsWs.send(JSON.stringify({
+                        type: "client_tool_result",
+                        tool_call_id: toolCallId,
+                        result: `The client responded: ${updated.answer}`,
+                        is_error: false,
+                      }));
+                      return;
+                    }
+                  }
+                  // Timeout
+                  elevenLabsWs.send(JSON.stringify({
+                    type: "client_tool_result",
+                    tool_call_id: toolCallId,
+                    result: "The client did not respond in time. Continue without this information or ask the operator directly.",
+                    is_error: false,
+                  }));
+                }).catch((err) => {
+                  console.error("[Bridge] Failed to create client question:", err);
+                  elevenLabsWs.send(JSON.stringify({
+                    type: "client_tool_result",
+                    tool_call_id: toolCallId,
+                    result: "Could not reach the client. Please ask the operator directly.",
+                    is_error: true,
+                  }));
+                });
+              }
+
+              break;
+            }
+
             case "interruption": {
               if (streamSid) {
                 twilioWs.send(JSON.stringify({ event: "clear", streamSid }));
@@ -216,11 +271,27 @@ mediaWss.on("connection", (twilioWs) => {
               }
               break;
             }
+
+            default: {
+              console.log(`[Bridge] Unhandled ElevenLabs event: ${message.type}`, JSON.stringify(message).slice(0, 300));
+              break;
+            }
           }
         });
 
         elevenLabsWs.on("error", (e) => console.error("[Bridge] ElevenLabs WS error:", e));
-        elevenLabsWs.on("close", () => console.log("[Bridge] ElevenLabs disconnected"));
+        elevenLabsWs.on("close", () => {
+          console.log("[Bridge] ElevenLabs disconnected");
+          // Mark call completed when ElevenLabs disconnects (e.g. after end_call system tool)
+          if (callId) {
+            prisma.call.update({
+              where: { id: callId },
+              data: { status: "completed", callEndedAt: new Date() },
+            }).catch(console.error);
+          }
+          // Close Twilio side too
+          if (twilioWs?.readyState === WebSocket.OPEN) twilioWs.close();
+        });
         break;
       }
 

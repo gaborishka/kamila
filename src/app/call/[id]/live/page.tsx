@@ -42,12 +42,19 @@ export default function LiveCallPage() {
     }
   }, [messages]);
 
-  // Redirect when call ends
+  // Redirect when call ends (but wait if there are pending questions)
   useEffect(() => {
     if (call?.status === "completed") {
+      if (questions.length > 0) {
+        // Give user time to answer pending questions before redirecting
+        const timeout = setTimeout(() => {
+          router.push(`/call/${callId}/result`);
+        }, 30000); // 30s grace period
+        return () => clearTimeout(timeout);
+      }
       router.push(`/call/${callId}/result`);
     }
-  }, [call?.status, callId, router]);
+  }, [call?.status, callId, router, questions.length]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, "0");

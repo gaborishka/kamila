@@ -5,7 +5,7 @@ export default function Footer() {
         <div className="flex flex-col gap-2">
           <div className="text-lg font-bold text-blue-900">Kamila AI</div>
           <p className="text-sm text-slate-500">
-            © 2024 Kamila AI. Credits: ElevenLabs, Firecrawl.
+            © 2026 Kamila AI. Credits: ElevenLabs, Firecrawl.
           </p>
         </div>
         <div className="flex items-center gap-8">

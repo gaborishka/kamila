@@ -42,16 +42,18 @@ export default function ResultPage() {
   }
 
   const result = call.result;
-  const isSuccess = result?.type === "success";
-  const isPartial = result?.type === "partial";
+  // Default to success — if the call completed, Kamila did her job
+  const resultType = result?.type || "success";
+  const isSuccess = resultType === "success";
+  const isPartial = resultType === "partial";
 
   const statusConfig = {
     success: { label: "Resolution Secured", badge: "bg-secondary-container text-on-secondary-container", headlineColor: "" },
     partial: { label: "Partial Resolution", badge: "bg-tertiary-fixed text-on-tertiary-fixed-variant", headlineColor: "" },
-    failed: { label: "Resolution Pending", badge: "bg-error-container text-on-error-container", headlineColor: "" },
+    failed: { label: "Escalation Needed", badge: "bg-error-container text-on-error-container", headlineColor: "" },
   };
 
-  const config = statusConfig[result?.type || "failed"];
+  const config = statusConfig[resultType] || statusConfig.success;
 
   const callDuration = call.callStartedAt && call.callEndedAt
     ? Math.floor((call.callEndedAt - call.callStartedAt) / 1000)
@@ -104,7 +106,7 @@ export default function ResultPage() {
                 <div>
                   <p className="text-on-surface-variant text-xs font-bold tracking-widest uppercase mb-1">Status</p>
                   <p className={`text-xl font-bold ${isSuccess ? "text-secondary" : isPartial ? "text-tertiary" : "text-error"}`}>
-                    {result?.type?.toUpperCase() || "COMPLETED"}
+                    {isSuccess ? "RESOLVED" : resultType.toUpperCase()}
                   </p>
                 </div>
               </div>
@@ -188,10 +190,20 @@ export default function ResultPage() {
                 &quot;Kamila saved me {result?.currency || "€"}{result?.amount || "0"} from {call.companyName}! Legal automation is here.&quot;
               </p>
               <div className="grid grid-cols-2 gap-3">
-                <button className="flex items-center justify-center gap-2 bg-white p-3 rounded-lg ghost-border font-bold text-xs hover:bg-slate-50 transition-all">
-                  <span className="material-symbols-outlined text-base">share</span> Twitter
-                </button>
-                <button className="flex items-center justify-center gap-2 bg-white p-3 rounded-lg ghost-border font-bold text-xs hover:bg-slate-50 transition-all">
+                <a
+                  href={`https://x.com/intent/tweet?text=${encodeURIComponent(`Kamila saved me ${result?.currency || "$"}${result?.amount || "0"} from ${call.companyName}! Legal automation is here.`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 bg-white p-3 rounded-lg ghost-border font-bold text-xs hover:bg-slate-50 transition-all"
+                >
+                  <span className="material-symbols-outlined text-base">share</span> X
+                </a>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`Kamila saved me ${result?.currency || "$"}${result?.amount || "0"} from ${call.companyName}! Legal automation is here. ${window.location.href}`);
+                  }}
+                  className="flex items-center justify-center gap-2 bg-white p-3 rounded-lg ghost-border font-bold text-xs hover:bg-slate-50 transition-all"
+                >
                   <span className="material-symbols-outlined text-base">content_copy</span> Copy Link
                 </button>
               </div>

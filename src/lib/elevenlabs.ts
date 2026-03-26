@@ -37,11 +37,15 @@ export async function createAgent({
 ## YOUR PERSONALITY
 - Talk like a real person on a phone call — natural, conversational, not robotic
 - Use short sentences. Pause naturally. React to what the operator says
-- NEVER repeat information you already said. If you stated the problem, don't restate it
-- Listen first, then respond to what they actually said
 - Be warm but assertive — like a friendly lawyer, not a script reader
 - Say "mm-hmm", "I see", "right" when acknowledging
 - Don't dump all information at once — reveal details progressively as the conversation flows
+
+## CRITICAL: DO NOT REPEAT YOURSELF
+- NEVER restate information you already said. Once you've explained the problem, DO NOT explain it again.
+- NEVER summarize what was just agreed upon unless the operator asks you to. If they say "okay we'll do it", just say "great, thank you" — don't repeat the details back.
+- When the operator confirms something, accept it briefly. Don't re-confirm by restating everything.
+- Each of your responses should add NEW information or move the conversation forward. If you have nothing new to add, keep it to 1-2 words like "Great" or "Thank you".
 
 ## CLIENT'S SITUATION
 Client: {{customer_name}}
@@ -67,9 +71,16 @@ ${additionalInfoSection}
 5. If offered partial solution: negotiate for more, but know when to accept a good deal
 6. Get operator name and reference number before ending the call
 
+## ENDING THE CALL
+- When the conversation is done (you got a resolution, or there's nothing more to discuss), say a SINGLE brief goodbye like "Thank you, have a good day" and IMMEDIATELY use the end_call tool.
+- NEVER say goodbye more than once. NEVER ask "is there anything else" after the operator already said goodbye.
+- If the operator says "bye" or "have a good day", respond with ONE short goodbye and use end_call immediately.
+- Do NOT linger. Once both sides have said goodbye, the call is OVER.
+
 ## RULES
 - Use {{customer_name}}, {{order_number}}, and {{problem_description}} as provided
-- If you need info you don't have, use the ask_client tool. Say "Let me check with my client" to the operator
+- CRITICAL: When you need info you don't have, call the ask_client tool IMMEDIATELY — do NOT say "let me check" without calling the tool at the same time. Call the tool FIRST, then tell the operator you're checking. Never mention checking with your client unless you are simultaneously invoking the ask_client tool.
+- While waiting for the ask_client tool response, tell the operator "One moment please, I'm confirming with my client" — say it ONCE, then wait silently for the response.
 - IMPORTANT: Speak in the language specified by code "${language}". Only switch to English if the operator does first.`;
 
   const firstMessages: Record<string, string> = {
@@ -111,37 +122,43 @@ ${additionalInfoSection}
       name: `Kamila - Refund Agent for ${companyName}`,
       conversation_config: {
         agent: {
-          prompt: { prompt: systemPrompt },
-          first_message: firstMessage,
-          language,
-          tools: [
-            {
-              type: "webhook",
-              name: "search_web",
-              description: "Search the web for additional legal arguments, consumer rights information, or company policies",
-              api_schema: {
-                url: `${webhookUrl}/api/tools/firecrawl-search`,
-                method: "POST",
-                request_body: {
-                  type: "object",
-                  properties: {
-                    query: {
-                      type: "string",
-                      description: "The search query to find relevant information",
-                    },
-                  },
-                  required: ["query"],
+          prompt: {
+            prompt: systemPrompt,
+            tools: [
+              {
+                type: "system",
+                name: "end_call",
+                description: "End the call when the conversation is complete, a resolution has been reached, or both sides have said goodbye.",
+                params: {
+                  system_tool_type: "end_call",
                 },
               },
-            },
-            {
-              type: "webhook",
-              name: "ask_client",
-              description: "Ask your client (the person who initiated this call) for information you need but don't have. Use this when the operator asks for details like order number, account number, date of purchase, exact amount, or any other information not in your briefing. The client is listening live and will respond.",
-              api_schema: {
-                url: `${webhookUrl}/api/tools/ask-client?callId=${callId}`,
-                method: "POST",
-                request_body: {
+              {
+                type: "webhook",
+                name: "search_web",
+                description: "Search the web for additional legal arguments, consumer rights information, or company policies",
+                api_schema: {
+                  url: `${webhookUrl}/api/tools/firecrawl-search`,
+                  method: "POST",
+                  request_body_schema: {
+                    type: "object",
+                    properties: {
+                      query: {
+                        type: "string",
+                        description: "The search query to find relevant information",
+                      },
+                    },
+                    required: ["query"],
+                  },
+                },
+              },
+              {
+                type: "client",
+                name: "ask_client",
+                description: "Ask your client (the person who initiated this call) for information you need but don't have. Use this when the operator asks for details like order number, account number, date of purchase, exact amount, or any other information not in your briefing. The client is listening live and will respond.",
+                expects_response: true,
+                response_timeout_secs: 60,
+                parameters: {
                   type: "object",
                   properties: {
                     question: {
@@ -152,8 +169,10 @@ ${additionalInfoSection}
                   required: ["question"],
                 },
               },
-            },
-          ],
+            ],
+          },
+          first_message: firstMessage,
+          language,
         },
         tts: {
           model_id: "eleven_v3_conversational",
@@ -195,6 +214,7 @@ ${additionalInfoSection}
 
   if (!res.ok) {
     const error = await res.text();
+    console.error(`[ElevenLabs] Agent creation failed (${res.status}):`, error);
     throw new Error(`Failed to create agent: ${error}`);
   }
 

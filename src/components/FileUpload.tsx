@@ -42,7 +42,7 @@ export default function FileUpload({ onFileSelect, file }: FileUploadProps) {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center text-center cursor-pointer group transition-colors ${
+      className={`border-2 border-dashed rounded-lg px-4 py-3 flex items-center gap-3 cursor-pointer group transition-colors ${
         isDragging
           ? "border-primary bg-primary/5"
           : file
@@ -57,25 +57,21 @@ export default function FileUpload({ onFileSelect, file }: FileUploadProps) {
         onChange={handleChange}
         className="hidden"
       />
-      <div className="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-        <span className="material-symbols-outlined text-primary">
-          {file ? "check_circle" : "upload_file"}
-        </span>
-      </div>
+      <span className="material-symbols-outlined text-primary text-xl">
+        {file ? "check_circle" : "upload_file"}
+      </span>
       {file ? (
-        <>
-          <p className="text-sm font-bold text-on-surface">{file.name}</p>
-          <p className="text-xs text-on-surface-variant mt-1">
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-on-surface truncate">{file.name}</p>
+          <p className="text-xs text-on-surface-variant">
             {(file.size / 1024).toFixed(1)} KB — Click to change
           </p>
-        </>
+        </div>
       ) : (
-        <>
-          <p className="text-sm font-bold text-on-surface">
-            Upload receipt, screenshot, or photo
-          </p>
-          <p className="text-xs text-on-surface-variant mt-1">Supports PNG, JPG, PDF</p>
-        </>
+        <div>
+          <p className="text-sm font-bold text-on-surface">Upload receipt, screenshot, or photo</p>
+          <p className="text-xs text-on-surface-variant">PNG, JPG, PDF</p>
+        </div>
       )}
     </div>
   );
