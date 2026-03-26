@@ -1,6 +1,7 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 import Link from "next/link";
 import { useCallStatus } from "@/hooks/useCallStatus";
 import { useTranscript } from "@/hooks/useTranscript";
@@ -9,7 +10,9 @@ import Footer from "@/components/Footer";
 
 export default function ResultPage() {
   const params = useParams();
+  const router = useRouter();
   const callId = params.id as string;
+  const [retrying, setRetrying] = useState(false);
   const { call, loading } = useCallStatus(callId);
   const { messages } = useTranscript(callId, call?.status);
 
@@ -109,13 +112,12 @@ export default function ResultPage() {
             <div className="bg-primary text-on-primary p-8 rounded-xl flex flex-col justify-between">
               <div>
                 <p className="opacity-70 text-xs font-bold tracking-widest uppercase mb-1">Audio Evidence</p>
-                <h3 className="text-xl font-bold mb-4">{call.audioUrl ? "Recording Saved" : "No Recording"}</h3>
+                <h3 className="text-xl font-bold mb-4">{call.conversationId ? "Recording Saved" : "No Recording"}</h3>
               </div>
-              {call.audioUrl && (
-                <button className="w-full bg-surface-container-lowest text-primary py-3 rounded-md font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all">
-                  <span className="material-symbols-outlined">play_circle</span>
-                  Play Recording
-                </button>
+              {call.conversationId && (
+                <audio controls className="w-full mt-2" preload="none">
+                  <source src={`/api/calls/${callId}/audio`} type="audio/mpeg" />
+                </audio>
               )}
             </div>
           </div>
@@ -230,12 +232,24 @@ export default function ResultPage() {
                     <p className="text-xs text-on-error-container leading-relaxed mb-4">
                       You can escalate via the National Enforcement Body (NEB) or try calling again with additional arguments.
                     </p>
-                    <Link
-                      href="/call/new"
-                      className="inline-block bg-error text-on-error px-4 py-2 rounded-md text-xs font-bold hover:opacity-90 transition-all"
+                    <button
+                      disabled={retrying}
+                      onClick={async () => {
+                        setRetrying(true);
+                        try {
+                          const res = await fetch(`/api/calls/${callId}/retry`, { method: "POST" });
+                          if (res.ok) {
+                            const data = await res.json();
+                            router.push(`/call/${data.id}/preparing`);
+                          }
+                        } finally {
+                          setRetrying(false);
+                        }
+                      }}
+                      className="inline-block bg-error text-on-error px-4 py-2 rounded-md text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50"
                     >
-                      Try Again
-                    </Link>
+                      {retrying ? "Retrying..." : "Try Again"}
+                    </button>
                   </div>
                 </div>
               </div>

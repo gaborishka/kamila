@@ -56,8 +56,7 @@ function mulaw8kToPcm16k(b64) {
 await app.prepare();
 
 const server = createServer(async (req, res) => {
-  const url = new URL(req.url, `http://${hostname}:${port}`);
-  await handle(req, res, url);
+  await handle(req, res);
 });
 
 const mediaWss = new WebSocketServer({ noServer: true });

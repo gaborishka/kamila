@@ -360,9 +360,12 @@ export default function PreparingPage() {
           {prepError && (
             <div className="mt-8 text-center">
               <p className="text-error font-bold mb-4">{prepError}</p>
-              <a href="/call/new" className="inline-block bg-primary text-on-primary px-6 py-3 rounded-md font-bold">
+              <button
+                onClick={() => window.location.reload()}
+                className="inline-block bg-primary text-on-primary px-6 py-3 rounded-md font-bold"
+              >
                 Try Again
-              </a>
+              </button>
             </div>
           )}
         </div>
