@@ -23,23 +23,25 @@ function mulawToFloat32(base64: string): Float32Array {
   return samples;
 }
 
+// Boost factor for operator audio (phone mic is quieter than TTS)
+const OPERATOR_BOOST = 3.0;
+
 export function useAudioStream(callId: string, callStatus?: string) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [needsGesture, setNeedsGesture] = useState(false);
   const [volume, setVolume] = useState(0.7);
   const ctxRef = useRef<AudioContext | null>(null);
-  const gainRef = useRef<GainNode | null>(null);
+  const agentGainRef = useRef<GainNode | null>(null);
+  const operatorGainRef = useRef<GainNode | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const nextTimeAgent = useRef(0);
   const nextTimeOperator = useRef(0);
 
   useEffect(() => {
-    if (gainRef.current) {
-      gainRef.current.gain.value = volume;
-    }
+    if (agentGainRef.current) agentGainRef.current.gain.value = volume;
+    if (operatorGainRef.current) operatorGainRef.current.gain.value = volume * OPERATOR_BOOST;
   }, [volume]);
 
-  // Start or resume audio — can be called from user gesture
   const startAudio = useCallback(() => {
     const ctx = ctxRef.current;
     if (ctx && ctx.state === "suspended") {
@@ -54,15 +56,21 @@ export function useAudioStream(callId: string, callStatus?: string) {
     if (!callId || callStatus !== "live") return;
 
     const audioCtx = new AudioContext({ sampleRate: 8000 });
-    const gain = audioCtx.createGain();
-    gain.gain.value = volume;
-    gain.connect(audioCtx.destination);
+
+    const agentGain = audioCtx.createGain();
+    agentGain.gain.value = volume;
+    agentGain.connect(audioCtx.destination);
+
+    const operatorGain = audioCtx.createGain();
+    operatorGain.gain.value = volume * OPERATOR_BOOST;
+    operatorGain.connect(audioCtx.destination);
+
     ctxRef.current = audioCtx;
-    gainRef.current = gain;
+    agentGainRef.current = agentGain;
+    operatorGainRef.current = operatorGain;
     nextTimeAgent.current = 0;
     nextTimeOperator.current = 0;
 
-    // Check if browser blocked autoplay
     if (audioCtx.state === "suspended") {
       setNeedsGesture(true);
     } else {
@@ -95,7 +103,8 @@ export function useAudioStream(callId: string, callStatus?: string) {
 
       const source = ctxRef.current.createBufferSource();
       source.buffer = buffer;
-      source.connect(gainRef.current!);
+      const gainNode = data.source === "agent" ? agentGainRef.current! : operatorGainRef.current!;
+      source.connect(gainNode);
 
       const now = ctxRef.current.currentTime;
       const timeRef = data.source === "agent" ? nextTimeAgent : nextTimeOperator;
